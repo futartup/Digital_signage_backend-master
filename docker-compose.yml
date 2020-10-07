@@ -1,0 +1,50 @@
+version: '3'
+# volumes:
+  # data
+services:
+  gps:
+    build: 
+      context: .
+      dockerfile: ./Dockerfile
+    # command: python3 /app/manage.py runserver 0.0.0.0:80
+    volumes:
+      - .:/app
+    ports:
+      - "8001:8000"
+    depends_on:
+      - db_gps
+    networks:
+      - srm-backend_srm-backend_private_network
+  db_gps:
+    image: mysql:8.0.2
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: gps_backend
+    ports:
+      - "3309:3306"
+    volumes:
+      - "./data:/var/lib/mysql:rw"
+      - "./my.conf:/etc/mysql/conf.d/config-file.cnf"
+    networks:
+      - srm-backend_srm-backend_private_network
+    
+  admin_gps:
+    image: adminer
+    ports:
+      - "8081:8080"
+    networks:
+      - srm-backend_srm-backend_private_network
+  cache_gps:
+    image: redis:5.0.5
+    volumes:
+      - redis_data:/data
+    networks:
+      - srm-backend_srm-backend_private_network
+
+volumes:  
+  redis_data:
+  
+networks:
+  srm-backend_srm-backend_private_network:
+    external: true
+

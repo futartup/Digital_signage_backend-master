@@ -1,0 +1,398 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static '/fullcalendar-scheduler/main.css' %}">
+<style>
+    
+</style>
+{%endblock%}
+
+
+{% block dynamic %}
+<div class="container-fluid">
+    {% if video_update_status %}
+        <div class="card text-white bg-success shadow">
+            <div class="card-body">
+                <p class="m-0">{{video_update_status_message}}</p>
+            </div>
+        </div>
+    {% endif %}
+    <div class="d-sm-flex justify-content-between align-items-center mb-4">
+        <h3 class="text-dark mb-0">Videos <span class="badge badge-info badge-counter">Total Videos: {{total_videos}}</span></h3>
+        {% if admin %}
+            <a class="btn btn-primary btn-sm d-none d-sm-inline-block" role="button" data-toggle="modal" data-target="#myModal">
+                <i class="fas fa-download fa-sm text-white-50"></i>&nbsp;Upload Video
+            </a>
+        {%endif%}
+    </div>
+    <div class="row">
+        <div class="col-lg-3 mb-4 scrollbar square scrollbar-lady-lips thin" id="external-events" 
+             data-event='{"id": {{video.id}}, "uuid": {{video.uuid}}"}'>
+            <div class="card panels-card">
+                <div class="rounded-top grey lighten-2 dark-grey-text">
+                </div>
+                <!--Navbar-->
+                <nav class="navbar navbar-expand-lg navbar-dark grey lighten-5 d-flex justify-content-between z-depth-1-bottom">
+                    <div>
+                    <ul class="list-inline my-2 py-1 dark-grey-text">
+                        <li class="list-inline-item">
+                        <i class="fas fa-bars" aria-hidden="true"></i>
+                        </li>
+                        <li class="list-inline-item font-weight-bold text-uppercase">
+                        Videos
+                        </li>
+                    </ul>
+                    </div>
+                </nav>
+                <!--/.Navbar-->
+            
+                <div class="card-body grey lighten-5 rounded-bottom">
+                <!-- Grid row -->
+                <div class="row">
+                    <!-- Grid column -->
+                    <div class="col-6">
+                        {% for video in videos  %}
+                    <div class="card orange lighten-2 fc-event draggable">
+                        <div class="view overlay">
+                            <img class="card-img-top" src="{{video.thumbnail}}" alt="video">
+                            </div>
+                        <div class="card-body pb-0">
+                            <div class="d-flex justify-content-between">
+                                <h6 class="font-weight-bold mb-1">{{video.id}}</h6>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    {% endfor %}
+                    </div>
+                </div>
+                </div>
+            </div>
+            <p>
+                <input type='checkbox' id='drop-remove' />
+                <label for='drop-remove'>remove after drop</label>
+              </p>
+        </div>
+        <div class="col-lg-9 mb-4">
+            <input type="hidden" id="username" value="{{user}}">
+            <input class="form-control form-control-lg" type="text" id="playlist" placeholder="Playlist Name" name="playlist_name">
+            <select class="browser-default custom-select custom-select-lg mb-3" id="device" required="true">
+                <option value="" disabled="disabled">Select device to assign the playlist</option>
+                {% for d in devices %}
+                    <option value="{{d.uuid}}">{{d.device_name}}</option>
+                {% endfor %}
+            </select>
+            <div id='calendar-container'>
+                <div id='calendar'></div>
+            </div>
+            
+            
+        </div>
+    </div>
+    
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        <!--Modal: Name-->
+        <div class="modal fade" id="modal4" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+    
+            <!--Content-->
+            <div class="modal-content">
+                <!--Body-->
+                <div class="modal-body mb-0 p-0">
+                <div class="embed-responsive embed-responsive-16by9 z-depth-1-half">
+                    <iframe class="embed-responsive-item" src=""
+                    allowfullscreen></iframe>
+                </div>
+                </div>
+                <button type="button" class="btn btn-outline-primary btn-rounded btn-md ml-4" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+            <!--/.Content-->
+            </div>
+        </div>
+        <!--Modal: Name-->
+
+        <!-- Modal -->
+        <div id="myModal" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+        
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form action="/violin/{{user}}/" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="form-group">
+                            <label for="file1">Upload Video</label>
+                            <input type="file" class="form-control-file" id="video" name="video">
+                        </div>
+                        <div class="form-group">
+                            <label for="file2">Upload Thumbnail</label>
+                            <input type="file" class="form-control-file" id="thumbnail" name="thumbnail">  
+                        </div>
+                        <button class="btn btn-primary btn-block text-white btn-user" type="submit">Upload Video</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        
+            </div>
+        </div>
+        
+    </div>
+    <div class="col">
+        <div class="row">
+            
+        </div>
+    </div>
+</div>
+</div>
+</div>
+{%endblock%}
+
+{% block extra_js %}
+<script src="{% static '/fullcalendar-scheduler/main.js' %}"></script>
+<!-- <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script> -->
+<script src="{% static '/react/video.js' %}"></script>
+<script src='https://cdn.jsdelivr.net/npm/moment@2.27.0/min/moment.min.js'></script>
+<script>
+    $('#modal4').on('hidden.bs.modal', function (e) {
+        // do something...
+        $('#modal4 iframe').attr("src", $("#modal4 iframe").attr("src"));
+    });
+</script>
+<!-- <script>
+
+document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+          editable: true,
+          themeSystem: 'bootstrap',
+          initialView: 'resourceTimelineWeek',
+          dropInfo: function(event){
+                console.log(event);
+          },
+        });
+        calendar.render();
+      });
+
+  </script> -->
+<!-- <script>
+    var dt_from = "2014/11/01 00:34:44";
+var dt_to = "2014/11/24 16:37:43";
+
+$('.slider-time').html(dt_from);
+$('.slider-time2').html(dt_to);
+var min_val = Date.parse(dt_from)/1000;
+var max_val = Date.parse(dt_to)/1000;
+
+function zeroPad(num, places) {
+  var zero = places - num.toString().length + 1;
+  return Array(+(zero > 0 && zero)).join("0") + num;
+}
+function formatDT(__dt) {
+    var year = __dt.getFullYear();
+    var month = zeroPad(__dt.getMonth()+1, 2);
+    var date = zeroPad(__dt.getDate(), 2);
+    var hours = zeroPad(__dt.getHours(), 2);
+    var minutes = zeroPad(__dt.getMinutes(), 2);
+    var seconds = zeroPad(__dt.getSeconds(), 2);
+    return year + '-' + month + '-' + date + ' ' + hours + ':' + minutes + ':' + seconds;
+};
+
+
+$("#slider-range").slider({
+    range: true,
+    min: min_val,
+    max: max_val,
+    step: 10,
+    values: [min_val, max_val],
+    slide: function (e, ui) {
+        var dt_cur_from = new Date(ui.values[0]*1000); //.format("yyyy-mm-dd hh:ii:ss");
+        $('.slider-time').html(formatDT(dt_cur_from));
+
+        var dt_cur_to = new Date(ui.values[1]*1000); //.format("yyyy-mm-dd hh:ii:ss");                
+        $('.slider-time2').html(formatDT(dt_cur_to));
+    }
+});
+</script> -->
+
+
+<script>
+
+// With JQuery
+// var dt_from = "2014/11/01 00:34:44";
+// var dt_to = "2014/11/24 16:37:43";
+
+// $('.slider-time').html(dt_from);
+// $('.slider-time2').html(dt_to);
+// var min_val = Date.parse(dt_from)/1000;
+// var max_val = Date.parse(dt_to)/1000;
+
+// function zeroPad(num, places) {
+//   var zero = places - num.toString().length + 1;
+//   return Array(+(zero > 0 && zero)).join("0") + num;
+// }
+// function formatDT(__dt) {
+//     //var year = __dt.getFullYear();
+//     //var month = zeroPad(__dt.getMonth()+1, 2);
+//     //var date = zeroPad(__dt.getDate(), 2);
+//     var hours = zeroPad(__dt.getHours(), 2);
+//     var minutes = zeroPad(__dt.getMinutes(), 2);
+//     var seconds = zeroPad(__dt.getSeconds(), 2);
+//     return  hours + ':' + minutes + ':' + seconds;
+// };
+
+//var slider = new Slider('#slider-range', {});
+// $("#everyday").slider({
+//     tooltip: 'always',
+//     rangeHighlights: [{ "start": 2, "end": 5, "class": "category1" },
+//                       { "start": 7, "end": 8, "class": "category2" },
+//                       { "start": 17, "end": 19 },
+//                       { "start": 17, "end": 24 },
+//                       { "start": -3, "end": 19 }],
+//     slide: function (e, ui) {
+//         // var dt_cur_from = new Date(ui.values[0]*1000); //.format("yyyy-mm-dd hh:ii:ss");
+//         // $('.slider-time').html(formatDT(dt_cur_from));
+
+//         // var dt_cur_to = new Date(ui.values[1]*1000); //.format("yyyy-mm-dd hh:ii:ss");                
+//         // $('.slider-time2').html(formatDT(dt_cur_to));
+//     }
+// });
+
+
+// $("#slider-range").slider({
+//     range: true,
+//     min: 0,
+//     max: 1440,
+//     step: 15,
+//     values: [540, 1020],
+//     slide: function (e, ui) {
+//         var hours1 = Math.floor(ui.values[0] / 60);
+//         var minutes1 = ui.values[0] - (hours1 * 60);
+
+//         if (hours1.length == 1) hours1 = '0' + hours1;
+//         if (minutes1.length == 1) minutes1 = '0' + minutes1;
+//         if (minutes1 == 0) minutes1 = '00';
+//         if (hours1 >= 12) {
+//             if (hours1 == 12) {
+//                 hours1 = hours1;
+//                 minutes1 = minutes1 + " PM";
+//             } else {
+//                 hours1 = hours1 - 12;
+//                 minutes1 = minutes1 + " PM";
+//             }
+//         } else {
+//             hours1 = hours1;
+//             minutes1 = minutes1 + " AM";
+//         }
+//         if (hours1 == 0) {
+//             hours1 = 12;
+//             minutes1 = minutes1;
+//         }
+
+
+
+//         $('.slider-time').html(hours1 + ':' + minutes1);
+
+//         var hours2 = Math.floor(ui.values[1] / 60);
+//         var minutes2 = ui.values[1] - (hours2 * 60);
+
+//         if (hours2.length == 1) hours2 = '0' + hours2;
+//         if (minutes2.length == 1) minutes2 = '0' + minutes2;
+//         if (minutes2 == 0) minutes2 = '00';
+//         if (hours2 >= 12) {
+//             if (hours2 == 12) {
+//                 hours2 = hours2;
+//                 minutes2 = minutes2 + " PM";
+//             } else if (hours2 == 24) {
+//                 hours2 = 11;
+//                 minutes2 = "59 PM";
+//             } else {
+//                 hours2 = hours2 - 12;
+//                 minutes2 = minutes2 + " PM";
+//             }
+//         } else {
+//             hours2 = hours2;
+//             minutes2 = minutes2 + " AM";
+//         }
+
+//         $('.slider-time2').html(hours2 + ':' + minutes2);
+//     }
+// });
+
+
+// $('#timepicker1').mdtimepicker({
+
+//     // format of the time value (data-time attribute)
+//     timeFormat: 'hh:mm:ss.000', 
+
+//     // format of the input value
+//     format: 'h:mm:ss tt',      
+
+//     // theme of the timepicker
+//     // 'red', 'purple', 'indigo', 'teal', 'green', 'dark'
+//     theme: 'blue',        
+
+//     // determines if input is readonly
+//     readOnly: true,       
+
+//     // determines if display value has zero padding for hour value less than 10 (i.e. 05:30 PM); 24-hour format has padding by default
+//     hourPadding: false,
+
+//     // determines if clear button is visible  
+//     clearBtn: false
+
+// }); 
+
+
+// $('#timepicker2').mdtimepicker({
+
+// // format of the time value (data-time attribute)
+// timeFormat: 'hh:mm:ss.000', 
+
+// // format of the input value
+// format: 'h:mm:ss tt',      
+
+// // theme of the timepicker
+// // 'red', 'purple', 'indigo', 'teal', 'green', 'dark'
+// theme: 'blue',        
+
+// // determines if input is readonly
+// readOnly: true,       
+
+// // determines if display value has zero padding for hour value less than 10 (i.e. 05:30 PM); 24-hour format has padding by default
+// hourPadding: false,
+
+// // determines if clear button is visible  
+// clearBtn: false
+
+// }); 
+// Without JQuery
+
+
+
+// function onDragOver(event) {
+//   event.preventDefault();
+// }
+
+// function onDrop(event) {
+//   const id = event.dataTransfer.getData('text');
+//   const draggableElement = document.getElementById(id);
+//   const dropzone = event.target;
+//   dropzone.appendChild(draggableElement);
+//   event.dataTransfer.clearData();
+// }
+
+
+
+</script>
+{%endblock%}
