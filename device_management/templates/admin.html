@@ -14,6 +14,9 @@
                             <th>Added On</th>
                             <th>Status</th>
                             <th>Organization Name</th>
+                            {% if superuser %}
+                                <th>Assign Device</th>
+                            {% endif %}
                         </tr>
                     </thead>
                     <tbody>
@@ -25,6 +28,9 @@
                                 <td>{{admin.date_joined}}</td>
                                 <td>{{admin.is_active}}</td>
                                 <td>{{admin.organization_name}}</td>
+                                {% if superuser %}
+                                    <td><button type="button" class="btn btn-dark" onclick="assignDevice('{{admin.topic}}', {{admin.id}}, '{{user}}');">Assign Device</button></td>
+                                {% endif %}
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -50,7 +56,34 @@
 {% block extra_js %}
 <script>
     $(document).ready(function() {
-            $('#admin').DataTable();
+        $('#admin').DataTable();
     });
+
+    function assignDevice(topic, id, user) {
+        var device_name = window.prompt("Device name given to : ");
+        if (device_name == ''){
+            alert("You have to give a name to device");
+        }
+        else{
+            $.ajax({
+                url: '/api/device/?username='+user,
+                type: "POST",
+                data: {
+                    "topic": topic,
+                    "message": "Device assigned",
+                    "name": device_name,
+                    "belongs_to": id,
+                    "status": false
+                },
+                success: function(data, status){
+                    alert(status);
+                },
+                error: function(data, status, error){
+                    alert(error);
+                }
+            })
+        }
+    }
+    
 </script>
 {%endblock%}

@@ -90,13 +90,19 @@ class AdminViewSet(ModelViewSet):
     def create(self, request, *args, **kwargs):
         try:
             request.data['password'] = make_password(request.data['password'], None, 'md5')
-            request.data['topic'] = "{}/{}".format(request.data['organization_name'], request.data['organization_uuid'])
+            added_by = request.data.get('added_by', None)
+            if request.GET['query']['superuser']:
+                request.data['topic'] = "{}/{}".format(request.data['organization_name'].replace(' ', '_'), request.data['organization_uuid'])
+            else:
+                added_by_obj = Admin.objects.get(id=added_by)
+                request.data['topic'] = added_by_obj.topic
+                request.data['organization_name'] = added_by_obj.organization_name
             serializer = self.serializer_class(data=request.data)
             serializer.is_valid(raise_exception=True)
             obj = serializer.save()
             #if obj:
             #    subprocess.run(['mosquitto_sub -h localhost -t "{}"'.format(obj.topic)])
-            return Response(serializer.data, status=status.HTTP_412_PRECONDITION_FAILED)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"status": "Failed", "message": e.__str__()}, status=status.HTTP_200_OK)
         
@@ -194,49 +200,49 @@ class VideoViewSet(ModelViewSet):
                              "message": "you cannot add video"},
                             status=status.HTTP_412_PRECONDITION_FAILED)
 
-    def destroy(self, request, *args, **kwargs):
-        # NOTE: Always append slash on the API call or else it will call retrieve API
-        super_user = request.GET['query']['superuser']
-        admin = request.GET['query']['admin']
-        organization_uuid = request.GET['query']['organization_uuid']
-        device_uuid = request.GET.get('device_uuid', None)
-        playtime_uuid = request.GET.get('playtime_uuid', None)
-        video_uuid = kwargs['uuid']
-        video_obj = self.get_object()
-        video_url = os.environ['HOST_NAME']+ video_obj.video.url
-        thumbnail_url = os.environ['HOST_NAME'] + video_obj.thumbnail.url
-        topic = video_obj.belongs_to.topic
+    # def destroy(self, request, *args, **kwargs):
+    #     # NOTE: Always append slash on the API call or else it will call retrieve API
+    #     super_user = request.GET['query']['superuser']
+    #     admin = request.GET['query']['admin']
+    #     organization_uuid = request.GET['query']['organization_uuid']
+    #     device_uuid = request.GET.get('device_uuid', None)
+    #     playtime_uuid = request.GET.get('playtime_uuid', None)
+    #     video_uuid = kwargs['uuid']
+    #     video_obj = self.get_object()
+    #     video_url = os.environ['HOST_NAME']+ video_obj.video.url
+    #     thumbnail_url = os.environ['HOST_NAME'] + video_obj.thumbnail.url
+    #     topic = video_obj.belongs_to.topic
 
-        if playtime_uuid != None:
-            device_obj = Device.objects.get(video__uuid=video_uuid, uuid=device_uuid, playtime__uuid=playtime_uuid)
-            playtime_obj = PlayTimeSchedule.objects.get(uuid=playtime_uuid)
-            video_obj.playtime.remove(playtime_obj)
-            device_obj.playtime.remove(playtime_obj)
-            device_obj.video.remove(video_obj)
-            devices = [device_obj.uuid.__repr__()]
-        elif device_uuid != None:
-            device_obj = Device.objects.get(video__uuid=video_uuid, uuid=device_uuid)
-            video_obj.playtime.clear()
-            device_obj.playtime.clear()
-            device_obj.video.remove(video_obj)
-            devices = [device_obj.uuid.__repr__()]
-        else:
-            device_objs = Device.objects.filter(video__uuid=video_uuid)
-            video_obj.playtime.clear()
-            for d in device_objs:
-                d.playtime.clear()
-                d.video.remove(video_obj)
-            devices = [d.uuid.__repr__() for d in device_objs]
+    #     if playtime_uuid != None:
+    #         device_obj = Device.objects.get(video__uuid=video_uuid, uuid=device_uuid, playtime__uuid=playtime_uuid)
+    #         playtime_obj = PlayTimeSchedule.objects.get(uuid=playtime_uuid)
+    #         video_obj.playtime.remove(playtime_obj)
+    #         device_obj.playtime.remove(playtime_obj)
+    #         device_obj.video.remove(video_obj)
+    #         devices = [device_obj.uuid.__repr__()]
+    #     elif device_uuid != None:
+    #         device_obj = Device.objects.get(video__uuid=video_uuid, uuid=device_uuid)
+    #         video_obj.playtime.clear()
+    #         device_obj.playtime.clear()
+    #         device_obj.video.remove(video_obj)
+    #         devices = [device_obj.uuid.__repr__()]
+    #     else:
+    #         device_objs = Device.objects.filter(video__uuid=video_uuid)
+    #         video_obj.playtime.clear()
+    #         for d in device_objs:
+    #             d.playtime.clear()
+    #             d.video.remove(video_obj)
+    #         devices = [d.uuid.__repr__() for d in device_objs]
 
-        # Publish message to MQTT
-        if bool(devices):
-            publish.single(topic, 
-                        {"devices": devices.__repr__(), 
-                        "message": 204,
-                        "video": video_url,
-                        "thumbnail": thumbnail_url}.__repr__())
-        return Response({"status": "Sucsess"},
-                        status=status.HTTP_200_OK)
+    #     # Publish message to MQTT
+    #     if bool(devices):
+    #         publish.single(topic, 
+    #                     {"devices": devices.__repr__(), 
+    #                     "message": 204,
+    #                     "video": video_url,
+    #                     "thumbnail": thumbnail_url}.__repr__())
+    #     return Response({"status": "Sucsess"},
+    #                     status=status.HTTP_200_OK)
     
 
 class PlayListViewSet(ModelViewSet):
@@ -350,6 +356,15 @@ class PlayListViewSet(ModelViewSet):
         for v in videos:
             v.playtime.clear()
         playlist_obj.delete()
+
+        # Publish to delete the playlist from the device
+        hostname = os.environ['MQTT_HOSTNAME']    
+        topic = device_obj.belongs_to.topic
+        publish.single(topic, {"devices": device_obj.uuid.__str__(), 
+                               "message": videos_list,
+                               "message_code": 8000,}.__repr__(),                                
+                               hostname=hostname)
+
         return Response({"status": "success", "message": "Deleted"}, status=status.HTTP_200_OK)
                     
 
@@ -397,12 +412,12 @@ class DeviceViewSet(ModelViewSet):
         if super_user:
             topic = request.data.get("topic")
             message = request.data.get("message")
-            device = request.data.get("device")
+            #device = request.data.get("device")
             hostname = os.environ['MQTT_HOSTNAME']
             admin_id = Admin.objects.get(id=request.data.get("belongs_to"))
             Device.objects.create(name=request.data.get("name"),
                                   belongs_to=admin_id)
-            publish.single(topic, {"devices": device, "message": message}.__repr__(), hostname=hostname)
+            #publish.single(topic, {"devices": device, "message": message}.__repr__(), hostname=hostname)
             return Response({"status": "success", "message": "published {}".format(message)},
                             status=status.HTTP_200_OK)
         else:

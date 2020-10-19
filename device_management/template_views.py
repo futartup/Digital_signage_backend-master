@@ -42,6 +42,7 @@ def login(request):
         context = {}
         username = request.POST.get('username')
         password = request.POST.get('password')
+
         resp = api_call(request.method, '/api/token/', json.dumps({'username': username, 'password': password}), {'Content-Type': 'application/json'})
         logger.info(resp.status_code)
         
@@ -209,4 +210,5 @@ def playlist(request, username, data={}):
     playlist_resp = api_call('GET', '/api/playlist/?username={}'.format(username), header={'Authorization': 'Bearer {}'.format(data['access'])})
     data['total_playlist'] = len(playlist_resp.json())
     data['playlist'] = playlist_resp.json()
+    print(data['playlist'] )
     return render(request, 'playlist.html', data)

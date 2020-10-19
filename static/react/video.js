@@ -76,10 +76,10 @@ document.addEventListener('DOMContentLoaded', function() {
       },
       // When the video is dropped into the calendar
       eventReceive: function(info) {       
-        alert("Video ID :" + info.event.title + " is added on " + info.event.start.toUTCString());
-        if (!confirm("Are you sure about this change?")) {
-          info.revert();
-        }
+        // alert("Video ID :" + info.event.title + " is added on " + info.event.start.toUTCString());
+        // if (!confirm("Are you sure about this change?")) {
+        //   info.revert();
+        // }
       },
       // State maintaining all the event states
       eventsSet: function(events) {
@@ -87,13 +87,29 @@ document.addEventListener('DOMContentLoaded', function() {
       },
       // When the video is resized into the calendar
       eventResize: function(info) {
-        alert("Video will end at " + info.event.end.toISOString());
-        if (!confirm("is this okay?")) {
-          info.revert();
-        }
+        // alert("Video will end at " + info.event.end.toISOString());
+        // if (!confirm("is this okay?")) {
+        //   info.revert();
+        // }
       }
 
     });
   
     calendar.render();
   });
+
+
+// Deleting the videos
+// function remove(video_uuid, username) {
+//   alert(video_id);
+//   $.ajax({
+//       url: "/api/video/" + video_uuid + '/' + '?username='+ username,
+//       method: "DELETE",
+//       success: function(data, status) {
+//         alert(status);
+//       },
+//       error: function(data, status, error) {
+//         alert(error);
+//       },
+//   });
+// }

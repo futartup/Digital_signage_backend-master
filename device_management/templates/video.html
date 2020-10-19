@@ -53,19 +53,20 @@
                     <!-- Grid column -->
                     <div class="col-6">
                         {% for video in videos  %}
-                    <div class="card orange lighten-2 fc-event draggable">
-                        <div class="view overlay">
-                            <img class="card-img-top" src="{{video.thumbnail}}" alt="video">
+                            <div class="card orange lighten-2 fc-event draggable">
+                                <div class="view overlay">
+                                    <img class="card-img-top" src="{{video.thumbnail}}" alt="video">
+                                    </div>
+                                <div class="card-body pb-0">
+                                    <div class="d-flex justify-content-between">
+                                        <h6 class="font-weight-bold mb-1">{{video.id}}</h6>
+                                    </div>
+                                </div>
+                                
                             </div>
-                        <div class="card-body pb-0">
-                            <div class="d-flex justify-content-between">
-                                <h6 class="font-weight-bold mb-1">{{video.id}}</h6>
-                            </div>
-                        </div>
-                        
+                        {% endfor %}
                     </div>
-                    {% endfor %}
-                    </div>
+                    
                 </div>
                 </div>
             </div>

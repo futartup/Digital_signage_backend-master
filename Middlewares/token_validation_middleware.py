@@ -5,6 +5,7 @@ import six
 import struct
 import logging
 
+from django.core.cache import cache
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicNumbers
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
@@ -76,75 +77,89 @@ class TokenValidationMiddleware(object):
     def __call__(self, request):
         if check_if_middleware_required(request) or \
                 check_on_particular_method(request):
-            auth = request.META.get('HTTP_AUTHORIZATION')
-            if not auth:
-                return JsonResponse(data={
-                    "code": "authorization_header_missing",
-                    "description": "Authorization header is expected"},
-                    status=401)
-            # parts = auth.split()
-            # if parts[0].lower() != "bearer":
-            #     return JsonResponse(
-            #         data={"code": "invalid_header",
-            #               "description": "Authorization header must start"
-            #                              " with Bearer"}, status=401)
-            # elif len(parts) == 1:
-            #     return JsonResponse(
-            #         data={"code": "invalid_header",
-            #               "description": "Token not found"}, status=401)
-            # elif len(parts) > 2:
-            #     return JsonResponse(data={
-            #         "code": "invalid_header",
-            #         "description":
-            #             "Authorization header must be Bearer token"},
-            #         status=401)
+            decoded_token = {}
+            if "username" in request.GET:
+                if cache.__contains__(request.GET.get("username")):
+                    userdata = cache.get(request.GET.get("username"))
+                else:
+                    return JsonResponse(data={
+                        "code": "Username is not logged in",
+                        "description": "Authorization header is expected"},
+                        status=401) 
+            else:
+                auth = request.META.get('HTTP_AUTHORIZATION')
+                if not auth:
+                    return JsonResponse(data={
+                        "code": "authorization_header_missing",
+                        "description": "Authorization header is expected"},
+                        status=401)
+                # parts = auth.split()
+                # if parts[0].lower() != "bearer":
+                #     return JsonResponse(
+                #         data={"code": "invalid_header",
+                #               "description": "Authorization header must start"
+                #                              " with Bearer"}, status=401)
+                # elif len(parts) == 1:
+                #     return JsonResponse(
+                #         data={"code": "invalid_header",
+                #               "description": "Token not found"}, status=401)
+                # elif len(parts) > 2:
+                #     return JsonResponse(data={
+                #         "code": "invalid_header",
+                #         "description":
+                #             "Authorization header must be Bearer token"},
+                #         status=401)
 
-            token = auth.split(' ')[1]
+                token = auth.split(' ')[1]
 
-            # Confirm A JSON Web Token (JWT) includes three sections
-            token_parts = token.split('.')
-            if len(token_parts) != 3:
-                return JsonResponse(data={"code": "invalid_header",
-                                          "description": "Invalid Token"},
-                                    status=401)
+                # Confirm A JSON Web Token (JWT) includes three sections
+                token_parts = token.split('.')
+                if len(token_parts) != 3:
+                    return JsonResponse(data={"code": "invalid_header",
+                                            "description": "Invalid Token"},
+                                        status=401)
 
-            # Match the public Keys
-            # jwt_headers = jwt.get_unverified_header(token)
-            # kid = jwt_headers["kid"]
-            # jwks = json.loads(base64.urlsafe_b64decode(settings.JWKS).decode())
-            # for public_key in jwks['keys']:
-            #     if kid == public_key["kid"]:
-            #         break
-            # else:
-            #     return JsonResponse(
-            #         data={"code": "invalid_header",
-            #               "description": "Public Key not found."},
-            #         status=401)
+                # Match the public Keys
+                # jwt_headers = jwt.get_unverified_header(token)
+                # kid = jwt_headers["kid"]
+                # jwks = json.loads(base64.urlsafe_b64decode(settings.JWKS).decode())
+                # for public_key in jwks['keys']:
+                #     if kid == public_key["kid"]:
+                #         break
+                # else:
+                #     return JsonResponse(
+                #         data={"code": "invalid_header",
+                #               "description": "Public Key not found."},
+                #         status=401)
 
-            # Decode the token and verify claims
-            # exponent = base64_to_long(public_key['e'])
-            # modulus = base64_to_long(public_key['n'])
-            # numbers = RSAPublicNumbers(exponent, modulus)
-            # public_key = numbers.public_key(backend=default_backend())
-            # pem = public_key.public_bytes(
-            #     encoding=serialization.Encoding.PEM,
-            #     format=serialization.PublicFormat.SubjectPublicKeyInfo)
+                # Decode the token and verify claims
+                # exponent = base64_to_long(public_key['e'])
+                # modulus = base64_to_long(public_key['n'])
+                # numbers = RSAPublicNumbers(exponent, modulus)
+                # public_key = numbers.public_key(backend=default_backend())
+                # pem = public_key.public_bytes(
+                #     encoding=serialization.Encoding.PEM,
+                #     format=serialization.PublicFormat.SubjectPublicKeyInfo)
 
-            try:
-            #     log.info("Validating Token %s with AUD %s ISS %s " %
-            #              (token, settings.AUDIENCE, settings.ISS))
-            #     decoded_token = jwt.decode(jwt=token, verify=False)
-                # have commented below till UI is ready with refresh
-                # token changes
-                decoded_token = jwt_decode_handler(token)
-            except jwt.ExpiredSignatureError as e:
-                return JsonResponse(data={"code": "invalid_header",
-                                          "description": "Token Expired:"
-                                                         " %s" % str(e)},
-                                    status=401)
+                try:
+                #     log.info("Validating Token %s with AUD %s ISS %s " %
+                #              (token, settings.AUDIENCE, settings.ISS))
+                #     decoded_token = jwt.decode(jwt=token, verify=False)
+                    # have commented below till UI is ready with refresh
+                    # token changes
+                    decoded_token = jwt_decode_handler(token)
+                except jwt.ExpiredSignatureError as e:
+                    return JsonResponse(data={"code": "invalid_header",
+                                            "description": "Token Expired:"
+                                                            " %s" % str(e)},
+                                        status=401)
             if not request.GET._mutable:
                 request.GET._mutable = True
-                request.GET['query'] = decoded_token
+                if bool(decoded_token):
+                    request.GET['query'] = decoded_token
+                elif userdata:
+                    request.GET.update({'query': userdata})
+                    #request.GET['query'] = userdata
 
             # log.info("Token Validated user -  %s, %s - cognito id  %s ." %
             #          (decoded_token['given_name'],

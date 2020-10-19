@@ -10,17 +10,7 @@
                             {% if signup_success %}
                                 <div class="card text-white bg-success shadow">
                                     <div class="card-body">
-                                        <p class="m-0">{{message}}</p>
-                                        {%if content %}
-                                            <p class="text-white-50 small m-0">Username: {{content.username}}</p>
-                                            <p class="text-white-50 small m-0">First Name: {{content.first_name}}</p>
-                                            <p class="text-white-50 small m-0">Last Name: {{content.last_name}}</p>
-                                            <p class="text-white-50 small m-0">Email: {{content.email}}</p>
-                                            <p class="text-white-50 small m-0">Admin: {{content.is_staff}}</p>
-                                            <p class="text-white-50 small m-0">Active: {{content.is_active}}</p>
-                                            <p class="text-white-50 small m-0">Organization Name: {{content.organization_name}}</p>
-                                            <p class="text-white-50 small m-0">Topic: {{content.topic}}</p>
-                                        {%endif%}
+                                        <p class="m-0">"Successfully Created"</p>
                                     </div>
                                 </div>
                             {%endif%}
