@@ -68,8 +68,9 @@ def login(request):
     return render(request, 'login.html', {'status': 'Not authorized'})
 
 
-@login_required
-def dashboard(request, username, data={}):
+#@login_required
+def dashboard(request):
+    data = {}
     return render(request, 'index.html', data)
     
 

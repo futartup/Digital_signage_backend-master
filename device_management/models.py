@@ -60,7 +60,7 @@ class PlayTimeSchedule(models.Model):
 
 class Video(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
-    status = models.BooleanField(default=False, blank=True, null=True)
+    status = models.BooleanField(default=False)
     added_on = models.DateTimeField(default=dt.now, null=True)
     removed_on = models.DateTimeField(default=dt.now, null=True)
     description = models.CharField(max_length=255, blank=True)
@@ -75,7 +75,7 @@ class Video(models.Model):
 
 class Device(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
-    status = models.BooleanField(default=False, blank=True, null=True)
+    status = models.BooleanField(default=False)
     added_on = models.DateTimeField(default=dt.now, null=True)
     removed_on = models.DateTimeField(default=dt.now, null=True)
     modified_on = models.DateTimeField(default=dt.now, null=True)

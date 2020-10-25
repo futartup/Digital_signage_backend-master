@@ -104,7 +104,7 @@ class AdminViewSet(ModelViewSet):
             #    subprocess.run(['mosquitto_sub -h localhost -t "{}"'.format(obj.topic)])
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
-            return Response({"status": "Failed", "message": e.__str__()}, status=status.HTTP_200_OK)
+            return Response({"status": "Failed", "message": e.__str__()}, status=status.HTTP_412_PRECONDITION_FAILED)
         
 
 class VideoViewSet(ModelViewSet):

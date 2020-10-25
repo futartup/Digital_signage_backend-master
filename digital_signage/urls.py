@@ -44,7 +44,8 @@ urlpatterns = [
 
     # templates URL
     path('login', login), #TODO: accept null string as argument
-    url('^dashboard/(?P<username>[\w.@+-]+)/$', dashboard),
+    #url('^dashboard/(?P<username>[\w.@+-]+)/$', dashboard),
+    url('^dashboard/$', dashboard),
     url('^anup/(?P<username>[\w.@+-]+)/$', video),
     url('^shikha/(?P<username>[\w.@+-]+)/$', device),
     url('^dudu/(?P<username>[\w.@+-]+)/$', register),
