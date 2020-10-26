@@ -74,16 +74,16 @@ def dashboard(request):
     return render(request, 'index.html', data)
     
 
-@login_required
-def video(request, username, data={}):
+#@login_required
+def video(request):
     # Video API call
-    videos_resp = api_call('GET', '/api/video/', header={'Authorization': 'Bearer {}'.format(data['access'])})
-    data['total_videos'] = len(videos_resp.json())
-    data['videos'] = videos_resp.json()
+    # videos_resp = api_call('GET', '/api/video/', header={'Authorization': 'Bearer {}'.format(data['access'])})
+    # data['total_videos'] = len(videos_resp.json())
+    # data['videos'] = videos_resp.json()
 
-    devices_resp = api_call('GET', '/api/device/', header={'Authorization': 'Bearer {}'.format(data['access'])})
-    data['devices'] = devices_resp.json()
-    return render(request, 'video.html', data)
+    # devices_resp = api_call('GET', '/api/device/', header={'Authorization': 'Bearer {}'.format(data['access'])})
+    # data['devices'] = devices_resp.json()
+    return render(request, 'video.html')
 
 
 @login_required
@@ -161,13 +161,13 @@ def logout(request, username, data={}):
     return render(request, 'login.html')
 
 
-@login_required
-def admins(request, username, data={}):
-    data = cache.get(username)
-    admin_resp = api_call('GET', '/api/users/', header={'Authorization': 'Bearer {}'.format(data['access'])})
-    data['total_admins'] = len(admin_resp.json())
-    data['admins'] = admin_resp.json()
-    return render(request, 'admin.html', data)
+#@login_required
+def admins(request):
+    #data = cache.get(username)
+    #admin_resp = api_call('GET', '/api/users/', header={'Authorization': 'Bearer {}'.format(data['access'])})
+    #data['total_admins'] = len(admin_resp.json())
+    #data['admins'] = admin_resp.json()
+    return render(request, 'admin.html')
 
 
 @login_required

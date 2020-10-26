@@ -46,11 +46,11 @@ urlpatterns = [
     path('login', login), #TODO: accept null string as argument
     #url('^dashboard/(?P<username>[\w.@+-]+)/$', dashboard),
     url('^dashboard/$', dashboard),
-    url('^anup/(?P<username>[\w.@+-]+)/$', video),
+    url('^anup/$', video),
     url('^shikha/(?P<username>[\w.@+-]+)/$', device),
     url('^dudu/(?P<username>[\w.@+-]+)/$', register),
     url('^logout/(?P<username>[\w.@+-]+)/$', logout),
-    url('^admins/(?P<username>[\w.@+-]+)/$', admins),
+    url('^admins/$', admins),
     url('^violin/(?P<username>[\w.@+-]+)/$', upload_video),
     url('^maadeuta/(?P<username>[\w.@+-]+)/$', playlist),
     

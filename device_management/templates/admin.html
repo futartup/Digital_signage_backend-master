@@ -2,37 +2,15 @@
 {% block dynamic %}
 <div class="container-fluid">
     <div class="d-sm-flex justify-content-between align-items-center mb-4">
-        <h3 class="text-dark mb-0">Admins <span class="badge badge-info badge-counter">Total Admins: {{total_admins}}</span></h3></div>
+        <h3 class="text-dark mb-0">Admins <span class="badge badge-info badge-counter" id="total-admins-badge"></span></h3></div>
     <div class="row">
         <div class="col-md-12">
                 <table id="admin" class="table table-striped table-bordered" cellspacing="0" width="100%">
                     <thead>
                         <tr>
-                            <th>Name</th>
-                            <th>Username</th>
-                            <th>Topic</th>
-                            <th>Added On</th>
-                            <th>Status</th>
-                            <th>Organization Name</th>
-                            {% if superuser %}
-                                <th>Assign Device</th>
-                            {% endif %}
                         </tr>
                     </thead>
                     <tbody>
-                        {% for admin in admins  %}
-                            <tr>
-                                <td>{{admin.first_name}}  {{admin.last_name}}</td>
-                                <td>{{admin.username}}</td>
-                                <td>{{admin.topic}}</td>
-                                <td>{{admin.date_joined}}</td>
-                                <td>{{admin.is_active}}</td>
-                                <td>{{admin.organization_name}}</td>
-                                {% if superuser %}
-                                    <td><button type="button" class="btn btn-dark" onclick="assignDevice('{{admin.topic}}', {{admin.id}}, '{{user}}');">Assign Device</button></td>
-                                {% endif %}
-                            </tr>
-                        {% endfor %}
                     </tbody>
                 </table>
         </div>
@@ -56,25 +34,88 @@
 {% block extra_js %}
 <script>
     $(document).ready(function() {
-        $('#admin').DataTable();
+        var stored_response = JSON.parse(localStorage.getItem('response'));
+        if (stored_response.superuser){
+            var columns = [
+                { title: "Name"},
+                { title: "Username" },
+                { title: "Added On" },
+                { title: "Status" },
+                { title: "Organization Name" },
+                { title: "Assign Device" }
+            ]
+        }
+        else{
+            var columns = [
+                { title: "Name"},
+                { title: "Username" },
+                { title: "Added On" },
+                { title: "Status" },
+                { title: "Organization Name" },
+            ]
+        }
+        var table = $('#admin').DataTable({
+            columns: columns,
+        });
+
+        var datas = []
+        var users = JSON.parse(localStorage.getItem('users'));
+        $('#total-admins-badge').text('Total Admins: ' + users.length);
+        users.forEach(function(dd){
+            temp_data = []
+            temp_data.push(dd.first_name + ' ' + dd.last_name);
+            temp_data.push(dd.username);
+            temp_data.push(dd.date_joined);
+            temp_data.push(dd.is_active);
+            temp_data.push(dd.organization_name)
+            if (stored_response.superuser){
+                temp_data.push(`<button type="button" class="btn btn-dark" onclick="assignDevice('${dd.topic}', ${dd.id}, '${dd.subject_name}');">Assign Device</button>`)
+            }
+            datas.push(temp_data);
+        });
+        table.rows.add(datas).draw();
     });
 
-    function assignDevice(topic, id, user) {
+    function populateDataTable(data) {
+        console.log("populating data table...");
+        // clear the table before populating it with more data
+        $("#admin").DataTable().clear();
+        var length = Object.keys(data.customers).length;
+        for(var i = 1; i < length+1; i++) {
+        var customer = data.customers['customer'+i];
+
+        // You could also use an ajax property on the data table initialization
+        $('#admin').dataTable().fnAddData([
+            customer.first_name + customer.last_name,
+            customer.username,
+            customer.date_joined,
+            customer.is_active,
+            customer.organization_name
+        ]);
+        }
+    }
+
+    function assignDevice(topic, id) {
         var device_name = window.prompt("Device name given to : ");
         if (device_name == ''){
             alert("You have to give a name to device");
         }
         else{
             $.ajax({
-                url: '/api/device/?username='+user,
-                type: "POST",
-                data: {
+                url: '/api/device/',
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*",
+                    "Authorization": "Bearer " + localStorage.getItem("token"),
+                },
+                data: JSON.stringify({
                     "topic": topic,
                     "message": "Device assigned",
                     "name": device_name,
                     "belongs_to": id,
                     "status": false
-                },
+                }),
                 success: function(data, status){
                     alert(status);
                 },

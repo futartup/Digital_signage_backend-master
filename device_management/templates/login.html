@@ -80,8 +80,8 @@
                                 return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
                             }).join(''));
                             const token = JSON.parse(jsonPayload);
-                            sessionStorage.setItem("token", data.access);
-                            sessionStorage.setItem("user", token.email);
+                            localStorage.setItem("token", data.access);
+                            localStorage.setItem("response", JSON.stringify(data));
                             window.location.href = "/dashboard";
                            
                         },
