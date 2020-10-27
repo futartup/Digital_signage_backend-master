@@ -9,6 +9,7 @@ from django.core.cache.backends.base import DEFAULT_TIMEOUT
 from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
 from requests_toolbelt.multipart.encoder import MultipartEncoder
+from django.http import HttpResponse
 
 
 # Model imports
@@ -170,14 +171,13 @@ def admins(request):
     return render(request, 'admin.html')
 
 
-@login_required
-def upload_video(request, username, data={}):
-    data = cache.get(username)
-    data['video_update_status'] = False
+#@login_required
+def upload_video(request, username):
+    #data = cache.get(username)
     video = request.FILES.get('video')
     thumbnail = request.FILES.get('thumbnail')
-   
-    admin = Admin.objects.get(id=data['id'])
+    
+    admin = Admin.objects.get(username=username)
     obj, created = Video.objects.get_or_create(video=video, 
                                       thumbnail=thumbnail, 
                                       defaults={
@@ -185,24 +185,24 @@ def upload_video(request, username, data={}):
                                       }
                                     )
 
-    videos_resp = api_call('GET', '/api/video/', header={'Authorization': 'Bearer {}'.format(data['access'])})
-    data['total_videos'] = len(videos_resp.json())
-    data['videos'] = videos_resp.json()
+    # videos_resp = api_call('GET', '/api/video/', header={'Authorization': 'Bearer {}'.format(data['access'])})
+    # data['total_videos'] = len(videos_resp.json())
+    # data['videos'] = videos_resp.json()
 
-    devices_resp = api_call('GET', '/api/device/', header={'Authorization': 'Bearer {}'.format(data['access'])})
-    data['devices'] = devices_resp.json()
+    # devices_resp = api_call('GET', '/api/device/', header={'Authorization': 'Bearer {}'.format(data['access'])})
+    # data['devices'] = devices_resp.json()
 
-    if obj:
-        data['total_videos'] += 1
-        cache.set(username, data)
-        data['video_update_status'] = True
-        if created:
-            data['video_update_status_message'] = "Successfully Uploaded Video"
-        else:
-            data['video_update_status_message'] = "Video already found"
-        return render(request, 'video.html', data)
-    data['video_update_status_message'] = resp.text
-    return render(request, 'video.html', data)
+    # if obj:
+    #     data['total_videos'] += 1
+    #     cache.set(username, data)
+    #     data['video_update_status'] = True
+    #     if created:
+    #         data['video_update_status_message'] = "Successfully Uploaded Video"
+    #     else:
+    #         data['video_update_status_message'] = "Video already found"
+    #     return render(request, 'video.html', data)
+    #data['video_update_status_message'] = resp.text
+    return render(request, 'video.html')
 
 
 @login_required

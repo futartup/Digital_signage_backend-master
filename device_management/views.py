@@ -130,7 +130,6 @@ class VideoViewSet(ModelViewSet):
             return Response({"status": "success",
                              "message": "you cannot add video"},
                             status=status.HTTP_412_PRECONDITION_FAILED)
-        
         if admin:
             if request.FILES:
                 try:
@@ -257,7 +256,7 @@ class PlayListViewSet(ModelViewSet):
         device_uuid = request.data.get("device_uuid")
         device_obj = Device.objects.get(uuid=device_uuid)
         if kwargs['from_cache']:
-            admin_id = cache.get(kwargs['username'])['id']
+            admin_id = Admin.objects.get(username=kwargs['username']).id
         else:
             admin_id = request.GET['query']['user_id']
 
@@ -329,7 +328,7 @@ class PlayListViewSet(ModelViewSet):
     def create(self, request, *args, **kwargs):
         username = request.GET.get("username", None)
         if username:
-            if cache.get(username):
+            if True:
                 # Will create the magic now
                 kwargs['from_cache'] = True
                 kwargs['username'] = username

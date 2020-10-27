@@ -19,12 +19,10 @@
         </div>
     {% endif %}
     <div class="d-sm-flex justify-content-between align-items-center mb-4">
-        <h3 class="text-dark mb-0">Videos <span class="badge badge-info badge-counter">Total Videos: {{total_videos}}</span></h3>
-        {% if admin %}
+        <h3 class="text-dark mb-0">Videos<span class="badge badge-info badge-counter" id="total-videos"></span></h3>
             <a class="btn btn-primary btn-sm d-none d-sm-inline-block" role="button" data-toggle="modal" data-target="#myModal">
                 <i class="fas fa-download fa-sm text-white-50"></i>&nbsp;Upload Video
             </a>
-        {%endif%}
     </div>
     <div class="row">
         <div class="col-lg-3 mb-4 scrollbar square scrollbar-lady-lips thin" id="external-events" 
@@ -49,22 +47,10 @@
             
                 <div class="card-body grey lighten-5 rounded-bottom">
                 <!-- Grid row -->
-                <div class="row">
+                <div class="row" style="overflow-y: scroll;height: 150 px;">
                     <!-- Grid column -->
                     <div class="col-6" id="video-list">
-                        <!-- {% for video in videos  %}
-                            <div class="card orange lighten-2 fc-event draggable">
-                                <div class="view overlay">
-                                    <img class="card-img-top" src="{{video.thumbnail}}" alt="video">
-                                    </div>
-                                <div class="card-body pb-0">
-                                    <div class="d-flex justify-content-between">
-                                        <h6 class="font-weight-bold mb-1">{{video.id}}</h6>
-                                    </div>
-                                </div>
-                                
-                            </div>
-                        {% endfor %} -->
+                        
                     </div>
                     
                 </div>
@@ -76,16 +62,18 @@
               </p>
         </div>
         <div class="col-lg-9 mb-4">
-            <input type="hidden" id="username" value="{{user}}">
+            <input type="hidden" id="username">
             <input class="form-control form-control-lg" type="text" id="playlist" placeholder="Playlist Name" name="playlist_name">
             <select class="browser-default custom-select custom-select-lg mb-3" id="device" required="true">
                 <option value="" disabled="disabled">Select device to assign the playlist</option>
-                {% for d in devices %}
+                <!-- {% for d in devices %}
                     <option value="{{d.uuid}}">{{d.device_name}}</option>
-                {% endfor %}
+                {% endfor %} -->
             </select>
             <div id='calendar-container'>
-                <div id='calendar'></div>
+                <div id='calendar'>
+
+                </div>
             </div>
             
             
@@ -122,21 +110,21 @@
             <!-- Modal content-->
             <div class="modal-content">
                 <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
-                <div class="modal-body">
-                    <form action="/violin/{{user}}/" method="post" enctype="multipart/form-data">
+                <div class="modal-body" method="post" >
+                    <form id="file-form" method="post" enctype="multipart/form-data" >
                         {% csrf_token %}
-                        
+
                         <div class="form-group">
                             <label for="file1">Upload Video</label>
-                            <input type="file" class="form-control-file" id="video" name="video">
+                            <input type="file" id="file1" class="form-control-file" id="video" name="video">
                         </div>
                         <div class="form-group">
                             <label for="file2">Upload Thumbnail</label>
-                            <input type="file" class="form-control-file" id="thumbnail" name="thumbnail">  
+                            <input type="file" id="file2" class="form-control-file" id="thumbnail" name="thumbnail">  
                         </div>
-                        <button class="btn btn-primary btn-block text-white btn-user" type="submit">Upload Video</button>
+                        <button class="btn btn-primary btn-block text-white btn-user" id="submit" type="submit">Upload Video</button>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -160,9 +148,71 @@
 
 {% block extra_js %}
 <script src="{% static '/fullcalendar-scheduler/main.js' %}"></script>
+<script>
+var response = JSON.parse(localStorage.getItem("response"));
+document.getElementById('username').value = response.user;
+$(document).ready(function() {
+    document.getElementById('file-form').action = '/violin/' + response.user + '/';
+    $.ajax({
+                url: '/api/video/',
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*",
+                    "Authorization": "Bearer " + localStorage.getItem("token"),
+                },
+                success: function(data, status){
+                    const container = document.getElementById('video-list');
+                    data.forEach((d, idx) => {
+                        // Construct card content                        
+                        const content = `
+                                        <div class="card orange lighten-2 fc-event draggable">
+                                            <div class="view overlay">
+                                                <img class="card-img-top" src="${d.thumbnail}" alt="video">
+                                                </div>
+                                            <div class="card-body pb-0">
+                                                <div class="d-flex justify-content-between">
+                                                    <h6 class="font-weight-bold mb-1">${d.id}</h6>
+                                                </div>
+                                            </div>
+                                            
+                                        </div>
+                                        `;
+
+                        // Append newyly created card element to the container
+                        container.innerHTML += content;
+                        document.getElementById('total-videos').textContent = 'Total Videos: ' + data.length;
+                    });
+                    $.ajax({
+                        url: '/api/device/',
+                        method: 'GET',
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Access-Control-Allow-Origin": "*",
+                            "Authorization": "Bearer " + localStorage.getItem("token"),
+                        },
+                        success: function(data, status){
+                            const container = document.getElementById('device');
+                            data.forEach((d, idx) => {
+                                const content = `<option value="${d.uuid}">${d.device_name}</option>`;
+                                container.innerHTML += content;
+                            });
+                        },
+                        error: function(data, status, error){
+                            alert(error);
+                        }
+                    });
+                },
+                error: function(data, status, error){
+                    alert(error);
+                }
+    })
+    
+});
+</script>
 <!-- <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
 <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script> -->
 <script src="{% static '/react/video.js' %}"></script>
-<script src='https://cdn.jsdelivr.net/npm/moment@2.27.0/min/moment.min.js'></script>
-    
+<!-- <script src='https://cdn.jsdelivr.net/npm/moment@2.27.0/min/moment.min.js'></script> -->
+
 {%endblock%}
