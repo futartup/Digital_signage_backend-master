@@ -3,8 +3,8 @@
 <div class="container-fluid">
     <div class="d-sm-flex justify-content-between align-items-center mb-4">
         <h3 class="text-dark mb-0">Devices  
-            <span class="badge badge-info badge-counter">Total Devices: {{total_devices}}</span>
-            <span class="badge badge-info badge-counter">Assigned Devices: {{videos_assigned_devices}}</span>
+            <span class="badge badge-info badge-counter" id="total-devices-badge"></span>
+            <!-- <span class="badge badge-info badge-counter" id="total-assigned-badge">Assigned Devices: {{videos_assigned_devices}}</span> -->
         </h3>
         <!-- {% if superuser %}
             <a class="btn btn-primary btn-sm d-none d-sm-inline-block" role="button" data-toggle="modal" data-target="#assignDeviceModal">
@@ -17,7 +17,7 @@
     </div>
     <div class="row">
         <div class="col-md-12">
-                <table id="playlist" class="table table-striped table-bordered" cellspacing="0" width="100%">
+                <table id="devices" class="table table-striped table-bordered" cellspacing="0" width="100%">
                     <thead>
                         <tr>
                             <th>Name</th>
@@ -28,16 +28,15 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for device in devices  %}
+                        <!-- {% for device in devices  %}
                             <tr>
                                 <td>{{device.device_name}}</td>
                                 <td>{{device.topic}}</td>
                                 <td>{{device.uuid}}</td>
                                 <td>{{device.added_on}}</td>
                                 <td>{{device.status}}</td>
-                                <!-- <td><button type="button" class="btn btn-primary" device_uuid="{{device.uuid}}" data-toggle="modal" data-target=".bd-example-modal-lg">Videos</button></td>
-                            </tr> -->
-                        {% endfor %}
+                            </tr> 
+                        {% endfor %} -->
                     </tbody>
                 </table>
             
@@ -89,7 +88,23 @@
 {% block extra_js %}
 <script>
   $(document).ready(function() {
-            $('#playlist').DataTable();
+        //var stored_response = JSON.parse(localStorage.getItem('response'));
+        var table = $('#devices').DataTable({
+        });
+
+        var datas = []
+        var devices = JSON.parse(localStorage.getItem('devices'));
+        $('#total-devices-badge').text('Total Devices: ' + devices.length);
+        devices.forEach(function(d){
+            temp_data = []
+            temp_data.push(d.device_name);
+            temp_data.push(d.topic);
+            temp_data.push(d.uuid);
+            temp_data.push(d.added_on);
+            temp_data.push(d.status)
+            datas.push(temp_data);
+        });
+        table.rows.add(datas).draw();
     });
 </script>
 {%endblock%}

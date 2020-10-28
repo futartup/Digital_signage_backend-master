@@ -12,14 +12,14 @@
                         <tr>
                             <th>ID</th>
                             <th>Name</th>
-                            <th>Videos Assigned</th>
-                            <th>Devices</th>
-                            <th>Schedule</th>
+                            <th>Total Videos Assigned</th>
+                            <th>Total Devices</th>
+                            <!-- <th>Schedule</th> -->
                             <!-- <th>Delete</th> -->
                         </tr>
                     </thead>
                     <tbody>
-                        {% for plast in playlist  %}
+                        <!-- {% for plast in playlist  %}
                             <tr>
                                 <td>{{plast.id}}</td>
                                 <td>{{plast.name}}</td>
@@ -30,9 +30,8 @@
                                     {%endfor%}
                                 </td>
                                 <td><button type="button" class="btn btn-dark" video_uuid="{{plast}}" data-toggle="modal" data-target="#scheduleModal">Schedule</button></td>
-                                <!-- <td><button type="button" class="btn btn-dark" onclick="deletePlaylist({{plast.video.devices}}, '{{plast.uuid}}', '{{user}}');" >Delete</button></td> -->
                             </tr>
-                        {% endfor %}
+                        {% endfor %} -->
                     </tbody>
                     <tfoot>
                         
@@ -80,7 +79,32 @@
 {% block extra_js %}
 <script>
     $(document).ready(function() {
-            $('#playlist').DataTable();
+        $.ajax({
+                url: '/api/playlist/',
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*",
+                    "Authorization": "Bearer " + localStorage.getItem("token"),
+                },
+                success: function(data, status){
+                    var playlist = $('#playlist').DataTable();
+                    var datas = []
+                    data.forEach(function(dd){
+                        temp_data = []
+                        temp_data.push(dd.id);
+                        temp_data.push(dd.name);
+                        temp_data.push(dd.video.total_video);
+                        temp_data.push(dd.video.devices.length);
+                        datas.push(temp_data);
+                    });
+                    playlist.rows.add(datas).draw();
+                },
+                error: function(data, status, error){
+                    alert(error);
+                }
+        })
+            
     });
 
     function deletePlaylist(devices, uuid, user) {

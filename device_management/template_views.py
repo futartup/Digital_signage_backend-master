@@ -87,14 +87,14 @@ def video(request):
     return render(request, 'video.html')
 
 
-@login_required
-def device(request, username, data={}):
+#@login_required
+def device(request):
     # Devices API call
-    devices_resp = api_call('GET', '/api/device/', header={'Authorization': 'Bearer {}'.format(data['access'])})
-    data['total_devices'] = len(devices_resp.json())
-    data['videos_assigned_devices'] = len([x for x in devices_resp.json() if x['status'] == 'True'])
-    data['devices'] = devices_resp.json()
-    return render(request, 'devices.html', data)
+    # devices_resp = api_call('GET', '/api/device/', header={'Authorization': 'Bearer {}'.format(data['access'])})
+    # data['total_devices'] = len(devices_resp.json())
+    # data['videos_assigned_devices'] = len([x for x in devices_resp.json() if x['status'] == 'True'])
+    # data['devices'] = devices_resp.json()
+    return render(request, 'devices.html')
 
 
 @login_required
@@ -205,11 +205,11 @@ def upload_video(request, username):
     return render(request, 'video.html')
 
 
-@login_required
-def playlist(request, username, data={}):
-    data = cache.get(username)
-    playlist_resp = api_call('GET', '/api/playlist/?username={}'.format(username), header={'Authorization': 'Bearer {}'.format(data['access'])})
-    data['total_playlist'] = len(playlist_resp.json())
-    data['playlist'] = playlist_resp.json()
-    print(data['playlist'] )
-    return render(request, 'playlist.html', data)
+#@login_required
+def playlist(request):
+    # data = cache.get(username)
+    # playlist_resp = api_call('GET', '/api/playlist/?username={}'.format(username), header={'Authorization': 'Bearer {}'.format(data['access'])})
+    # data['total_playlist'] = len(playlist_resp.json())
+    # data['playlist'] = playlist_resp.json()
+    # print(data['playlist'] )
+    return render(request, 'playlist.html')

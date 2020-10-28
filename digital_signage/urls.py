@@ -47,11 +47,11 @@ urlpatterns = [
     #url('^dashboard/(?P<username>[\w.@+-]+)/$', dashboard),
     url('^dashboard/$', dashboard),
     url('^anup/$', video),
-    url('^shikha/(?P<username>[\w.@+-]+)/$', device),
+    url('^shikha/$', device),
     url('^dudu/(?P<username>[\w.@+-]+)/$', register),
     url('^logout/(?P<username>[\w.@+-]+)/$', logout),
     url('^admins/$', admins),
     url('^violin/(?P<username>[\w.@+-]+)/$', upload_video),
-    url('^maadeuta/(?P<username>[\w.@+-]+)/$', playlist),
+    url('^maadeuta/$', playlist),
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

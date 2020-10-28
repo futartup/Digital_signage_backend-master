@@ -76,25 +76,6 @@
         table.rows.add(datas).draw();
     });
 
-    function populateDataTable(data) {
-        console.log("populating data table...");
-        // clear the table before populating it with more data
-        $("#admin").DataTable().clear();
-        var length = Object.keys(data.customers).length;
-        for(var i = 1; i < length+1; i++) {
-        var customer = data.customers['customer'+i];
-
-        // You could also use an ajax property on the data table initialization
-        $('#admin').dataTable().fnAddData([
-            customer.first_name + customer.last_name,
-            customer.username,
-            customer.date_joined,
-            customer.is_active,
-            customer.organization_name
-        ]);
-        }
-    }
-
     function assignDevice(topic, id) {
         var device_name = window.prompt("Device name given to : ");
         if (device_name == ''){

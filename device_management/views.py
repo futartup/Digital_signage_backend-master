@@ -316,11 +316,7 @@ class PlayListViewSet(ModelViewSet):
         return Response(serialized_data, status=status.HTTP_200_OK)
 
     def list(self, request, *args, **kwargs):
-        username = request.GET.get("username", None)
-        if username:
-            if cache.get(username):
-                # Will create the magic now
-                admin_id = cache.get(username)['id']
+        admin_id = request.GET['query']['user_id']
         queryset = self.get_queryset().select_related("belongs_to").filter(belongs_to=admin_id)
         serialized_data = self.serializer_class(queryset, many=True, context={"retrieve": True}).data 
         return Response(serialized_data, status=status.HTTP_200_OK)
