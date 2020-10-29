@@ -92,19 +92,32 @@
         var table = $('#devices').DataTable({
         });
 
-        var datas = []
-        var devices = JSON.parse(localStorage.getItem('devices'));
-        $('#total-devices-badge').text('Total Devices: ' + devices.length);
-        devices.forEach(function(d){
-            temp_data = []
-            temp_data.push(d.device_name);
-            temp_data.push(d.topic);
-            temp_data.push(d.uuid);
-            temp_data.push(d.added_on);
-            temp_data.push(d.status)
-            datas.push(temp_data);
-        });
-        table.rows.add(datas).draw();
+        $.ajax({
+                url: '/api/device/',
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*",
+                    "Authorization": "Bearer " + localStorage.getItem("token"),
+                },
+                success: function(data, status){
+                    var datas = []
+                    $('#total-devices-badge').text('Total Devices: ' + data.length);
+                    data.forEach(function(d){
+                        temp_data = []
+                        temp_data.push(d.device_name);
+                        temp_data.push(d.topic);
+                        temp_data.push(d.uuid);
+                        temp_data.push(d.added_on);
+                        temp_data.push(d.status)
+                        datas.push(temp_data);
+                    });
+                    table.rows.add(datas).draw();
+                },
+                error: function(data, status, error){
+                    alert(error);
+                }
+            })
     });
 </script>
 {%endblock%}
