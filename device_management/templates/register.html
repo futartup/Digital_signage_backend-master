@@ -52,11 +52,7 @@
         var stored_response = JSON.parse(localStorage.getItem('response'));
         if (stored_response.superuser){
             document.getElementById('admin-checkbox').style.display = "none";
-            var is_staff = true;
         }
-        else{
-            var is_staff = document.getElementById("is_staff").value;
-        } 
     });
 
 
