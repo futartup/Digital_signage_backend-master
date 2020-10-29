@@ -155,10 +155,9 @@ class TokenValidationMiddleware(object):
                                         status=401)
             if not request.GET._mutable:
                 request.GET._mutable = True
-                if bool(decoded_token):
-                    request.GET['query'] = decoded_token
-                elif userdata:
-                    request.GET.update({'query': userdata})
+                #if bool(decoded_token):
+                request.GET['query'] = decoded_token
+               
                     #request.GET['query'] = userdata
 
             # log.info("Token Validated user -  %s, %s - cognito id  %s ." %
