@@ -78,13 +78,14 @@ class TokenValidationMiddleware(object):
                 check_on_particular_method(request):
             decoded_token = {}
             if "username" in request.GET:
-                if cache.__contains__(request.GET.get("username")):
-                    userdata = cache.get(request.GET.get("username"))
-                else:
-                    return JsonResponse(data={
-                        "code": "Username is not logged in",
-                        "description": "Authorization header is expected"},
-                        status=401) 
+                # if cache.__contains__(request.GET.get("username")):
+                #     userdata = cache.get(request.GET.get("username"))
+                # else:
+                #     return JsonResponse(data={
+                #         "code": "Username is not logged in",
+                #         "description": "Authorization header is expected"},
+                #         status=401) 
+                pass
             else:
                 auth = request.META.get('HTTP_AUTHORIZATION')
                 if not auth:
