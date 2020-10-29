@@ -7,37 +7,35 @@
                     
                     <div class="col-lg-12">
                         <div class="p-5">
-                            {% if signup_success %}
+                            <!-- {% if signup_success %}
                                 <div class="card text-white bg-success shadow">
                                     <div class="card-body">
                                         <p class="m-0">"Successfully Created"</p>
                                     </div>
                                 </div>
-                            {%endif%}
+                            {%endif%} -->
                             <div class="text-center">
                                 <h4 class="text-dark mb-4">Create an Account!</h4>
                             </div>
-                            <form class="user" method="POST" action="/dudu/{{user}}/">
+                            <form class="user" id="register">
                                 {% csrf_token %}
                                 <div class="form-group row">
-                                    <div class="col-sm-6 mb-3 mb-sm-0"><input class="form-control form-control-user" type="text" id="exampleFirstName" placeholder="First Name" name="first_name"></div>
-                                    <div class="col-sm-6"><input class="form-control form-control-user" type="text" id="exampleFirstName" placeholder="Last Name" name="last_name"></div>
+                                    <div class="col-sm-6 mb-3 mb-sm-0"><input class="form-control form-control-user" type="text" id="first_name" placeholder="First Name" name="first_name"></div>
+                                    <div class="col-sm-6"><input class="form-control form-control-user" type="text" id="last_name" placeholder="Last Name" name="last_name"></div>
                                 </div>
-                                <div class="form-group"><input class="form-control form-control-user" type="email" id="exampleInputEmail" aria-describedby="emailHelp" placeholder="Email Address" name="email"></div>
-                                <div class="form-group"><input class="form-control form-control-user" type="text" id="exampleInputUsername" aria-describedby="usernameHelp" placeholder="Username" name="usernm"></div>
-                                <div class="form-group"><input class="form-control form-control-user" type="text" id="exampleInputorganizationname" aria-describedby="organizationnameHelp" placeholder="Organization Name" name="organization_name"></div>
+                                <div class="form-group"><input class="form-control form-control-user" type="email" id="email" aria-describedby="emailHelp" placeholder="Email Address" name="email"></div>
+                                <div class="form-group"><input class="form-control form-control-user" type="text" id="username" aria-describedby="usernameHelp" placeholder="Username should be unique eg. username/companyname" name="usernm"></div>
+                                <div class="form-group"><input class="form-control form-control-user" type="text" id="organization_name" aria-describedby="organizationnameHelp" placeholder="Organization Name" name="organization_name"></div>
                                 
                                 <div class="form-group row">
-                                    <div class="col-sm-6 mb-3 mb-sm-0"><input class="form-control form-control-user" type="password" id="examplePasswordInput" placeholder="Password" name="password"></div>
-                                    <div class="col-sm-6"><input class="form-control form-control-user" type="password" id="exampleRepeatPasswordInput" placeholder="Repeat Password" name="password_repeat"></div>
+                                    <div class="col-sm-6 mb-3 mb-sm-0"><input class="form-control form-control-user" type="password" id="password" placeholder="Password" name="password"></div>
+                                    <div class="col-sm-6"><input class="form-control form-control-user" type="password" id="repeat_password" placeholder="Repeat Password" name="password_repeat"></div>
                                 </div>
 
-                                {% if admin %}
-                                    <div class="form-group row">
-                                        <input type="radio" class="custom-control-input" id="defaultUnchecked" name="is_staff">
-                                        <label class="custom-control-label" for="defaultUnchecked">Is the user Admin</label>
-                                    </div>
-                                {% endif %}
+                                <div class="form-group row" id="admin-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="is_staff" name="is_staff" value="0">
+                                    <label class="custom-control-label" for="is_staff">Is the user Admin</label>
+                                </div>
                                 <button class="btn btn-primary btn-block text-white btn-user" type="submit">Register Account</button>
                             </form>
                         </div>
@@ -46,4 +44,81 @@
             </div>
         </div>
     </div>
-    {%endblock%}
+{%endblock%}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        var stored_response = JSON.parse(localStorage.getItem('response'));
+        if (stored_response.superuser){
+            document.getElementById('admin-checkbox').style.display = "none";
+            var is_staff = true;
+        }
+        else{
+            var is_staff = document.getElementById("is_staff").value;
+        } 
+    });
+
+
+    // function to return uuid4
+    function uuidv4() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+    }
+
+    
+    $('#register').submit(function(e){
+        e.preventDefault();
+        var isValid;
+        var stored_response = JSON.parse(localStorage.getItem('response'));
+        if (stored_response.superuser){
+            var is_staff = true;
+        }
+        else{
+            var is_staff = document.getElementById("is_staff").value;
+        } 
+        var username = document.forms["register"]["username"].value;
+        var password = document.forms["register"]["password"].value;
+        var organization_name = document.forms["register"]["organization_name"].value;
+        var email = document.forms["register"]["email"].value;
+        var first_name = document.forms["register"]["first_name"].value;
+        var last_name = document.forms["register"]["last_name"].value;
+
+        if (username == "" & password == "" & organization_name == "" & email == "" & first_name == "" & last_name == ""){
+            alert("You must filled all the values in the form");
+        }
+        else{
+            $.ajax({
+                url: '/api/signup/',
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*",
+                    "Authorization": "Bearer " + localStorage.getItem("token"),
+                },
+                data: JSON.stringify({
+                    "username": username,
+                    "password": password,
+                    "organization_name": organization_name,
+                    "email": email,
+                    "is_staff": is_staff,
+                    "is_superuser": stored_response.superuser,
+                    "added_by": stored_response.id,
+                    "first_name": first_name,
+                    "last_name": last_name,
+                    "organization_uuid": uuidv4(),
+                }),
+                success: function(data, status){
+                    alert(status);
+                },
+                error: function(data, status, error){
+                    alert(error);
+                }
+            })
+        }
+    });
+    
+</script>
+{%endblock%}

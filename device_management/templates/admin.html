@@ -57,23 +57,35 @@
         var table = $('#admin').DataTable({
             columns: columns,
         });
-
-        var datas = []
-        var users = JSON.parse(localStorage.getItem('users'));
-        $('#total-admins-badge').text('Total Admins: ' + users.length);
-        users.forEach(function(dd){
-            temp_data = []
-            temp_data.push(dd.first_name + ' ' + dd.last_name);
-            temp_data.push(dd.username);
-            temp_data.push(dd.date_joined);
-            temp_data.push(dd.is_active);
-            temp_data.push(dd.organization_name)
-            if (stored_response.superuser){
-                temp_data.push(`<button type="button" class="btn btn-dark" onclick="assignDevice('${dd.topic}', ${dd.id}, '${dd.subject_name}');">Assign Device</button>`)
-            }
-            datas.push(temp_data);
-        });
-        table.rows.add(datas).draw();
+        $.ajax({
+                url: '/api/users/',
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*",
+                    "Authorization": "Bearer " + localStorage.getItem("token"),
+                },
+                success: function(data, status){
+                    var datas = [];
+                    $('#total-admins-badge').text('Total Admins: ' + data.length);
+                    data.forEach(function(dd){
+                        temp_data = []
+                        temp_data.push(dd.first_name + ' ' + dd.last_name);
+                        temp_data.push(dd.username);
+                        temp_data.push(dd.date_joined);
+                        temp_data.push(dd.is_active);
+                        temp_data.push(dd.organization_name);
+                        if (stored_response.superuser){
+                            temp_data.push(`<button type="button" class="btn btn-dark" onclick="assignDevice('${dd.topic}', ${dd.id}, '${dd.subject_name}');">Assign Device</button>`)
+                        }
+                        datas.push(temp_data);
+                    });
+                    table.rows.add(datas).draw();
+                },
+                error: function(data, status, error){
+                    alert(error);
+                }
+            })
     });
 
     function assignDevice(topic, id) {

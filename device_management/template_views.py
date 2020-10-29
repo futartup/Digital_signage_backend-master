@@ -97,68 +97,67 @@ def device(request):
     return render(request, 'devices.html')
 
 
-@login_required
-def register(request, username, data={}):
-    data['signup_success'] = False
-    data['message'] = ''
-    if request.method == 'POST':
-        cached_user_data = cache.get(username)
-        first_name = request.POST.get("first_name")
-        last_name = request.POST.get("last_name")
-        organization_name = request.POST.get("organization_name")
-        email = request.POST.get("email")
-        usernm = request.POST.get("usernm")
-        password = request.POST.get("password")
-        print(request.POST.get("is_staff"))
-        if cached_user_data['superuser']:
-            is_staff = True 
-        else:
-            if request.POST.get("is_staff") is None:
-                is_staff = False
-            else:
-                is_staff = True
+#@login_required
+def register(request):
+    # data['signup_success'] = False
+    # data['message'] = ''
+    # if request.method == 'POST':
+    #     cached_user_data = cache.get(username)
+    #     first_name = request.POST.get("first_name")
+    #     last_name = request.POST.get("last_name")
+    #     organization_name = request.POST.get("organization_name")
+    #     email = request.POST.get("email")
+    #     usernm = request.POST.get("usernm")
+    #     password = request.POST.get("password")
+    #     print(request.POST.get("is_staff"))
+    #     if cached_user_data['superuser']:
+    #         is_staff = True 
+    #     else:
+    #         if request.POST.get("is_staff") is None:
+    #             is_staff = False
+    #         else:
+    #             is_staff = True
 
-        added_by = cached_user_data['id']
+    #     added_by = cached_user_data['id']
 
-        if cached_user_data['superuser']:
-            organization_uuid = uuid.uuid4().__str__() 
-        else:
-            organization_uuid = Admin.objects.get(id=added_by).organization_uuid.__str__()
+    #     if cached_user_data['superuser']:
+    #         organization_uuid = uuid.uuid4().__str__() 
+    #     else:
+    #         organization_uuid = Admin.objects.get(id=added_by).organization_uuid.__str__()
 
-        # Create the request body
-        body = {
-            "username": usernm,
-            "password": password,
-            "organization_name": organization_name,
-            "email": email,
-            "is_staff": is_staff,
-            "is_superuser": False,
-            "added_by": added_by,
-            "first_name": first_name,
-            "last_name": last_name,
-            "organization_uuid": organization_uuid
-        }
-        header = {
-            'Authorization': 'Bearer {}'.format(data['access']),
-            'Content-Type': 'application/json'
-        }
-        signup_resp = api_call('POST', '/api/signup/', json.dumps(body), header=header)
-        data['signup_success'] = True
-        if signup_resp.status_code == 200:
-            data['message'] = "Successfully Created"
-            data['content'] = signup_resp.json()
-            # update the cache
-            data['total_admins'] += 1
-            cache.set(username, data)
-        else:
-            data['message'] = "Failed to create"
-            
-    return render(request, 'register.html', data)
+    #     # Create the request body
+    #     body = {
+    #         "username": usernm,
+    #         "password": password,
+    #         "organization_name": organization_name,
+    #         "email": email,
+    #         "is_staff": is_staff,
+    #         "is_superuser": False,
+    #         "added_by": added_by,
+    #         "first_name": first_name,
+    #         "last_name": last_name,
+    #         "organization_uuid": organization_uuid
+    #     }
+    #     header = {
+    #         'Authorization': 'Bearer {}'.format(data['access']),
+    #         'Content-Type': 'application/json'
+    #     }
+    #     signup_resp = api_call('POST', '/api/signup/', json.dumps(body), header=header)
+    #     data['signup_success'] = True
+    #     if signup_resp.status_code == 200:
+    #         data['message'] = "Successfully Created"
+    #         data['content'] = signup_resp.json()
+    #         # update the cache
+    #         data['total_admins'] += 1
+    #         cache.set(username, data)
+    #     else:
+    #         data['message'] = "Failed to create"  
+    return render(request, 'register.html')
 
 
-@login_required
-def logout(request, username, data={}):
-    cache.delete(username)
+#@login_required
+def logout(request):
+    #cache.delete(username)
     return render(request, 'login.html')
 
 
