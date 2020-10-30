@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="{% static '/MDB/css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i">
     <link rel="stylesheet" href="{% static '/fonts/fontawesome-all.min.css' %}">
+    
     <!-- <script src="{% static '/MDB/css/addons/datatables.min.css' %}"></script> -->
     <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/css/bootstrap-slider.min.css" /> -->
     
@@ -149,6 +150,7 @@
     <!-- <script src="{% static '/js/bs-init.js' %}"></script> -->
     <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.js"></script>
     <script href="{% static '/js/theme.js' %}"></script> -->
+    
     <script>
         $(document).ready(function() {
             var stored_response = JSON.parse(localStorage.getItem('response'));
@@ -157,7 +159,13 @@
                 document.getElementById("menu-list").children[2].style.display="none";
                 document.getElementById("menu-list").children[3].style.display="none";
                 //document.getElementById("menu-list").children[4].style.display="none";
-
+            }
+            else if (stored_response.admin != true){
+                document.getElementById("menu-list").children[0].style.display="none";
+                document.getElementById("menu-list").children[1].style.display="none";
+                document.getElementById("menu-list").children[2].style.display="none";
+                document.getElementById("menu-list").children[4].style.display="none";
+                document.getElementById("menu-list").children[5].style.display="none";
             }
         });
         

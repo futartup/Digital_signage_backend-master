@@ -317,9 +317,27 @@ class PlayListViewSet(ModelViewSet):
         return Response(serialized_data, status=status.HTTP_200_OK)
 
     def list(self, request, *args, **kwargs):
-        admin_id = request.GET['query']['user_id']
-        queryset = self.get_queryset().select_related("belongs_to").filter(belongs_to=admin_id)
-        serialized_data = self.serializer_class(queryset, many=True, context={"retrieve": True}).data 
+        if 'org_uuid' in request.GET:
+            final_data = []
+            keys_found = {}
+            queryset = self.get_queryset().select_related("belongs_to").filter(belongs_to__organization_uuid=request.GET.get('org_uuid'))
+            serialized_data = self.serializer_class(queryset, many=True, context={"plain": True}).data 
+            for s in serialized_data:
+                for x in s['plain_video']:
+                    if x['id'] not in keys_found:
+                        final_data.append({
+                            'id': x['id'],
+                            'name': x['description'],
+                            'source': x['video'],
+                            'duration': '00:00:00',
+                            'img': ''
+                        })
+                        keys_found[x['id']] = True
+            return Response(final_data, status=status.HTTP_200_OK)
+        else:
+            admin_id = request.GET['query']['user_id']
+            queryset = self.get_queryset().select_related("belongs_to").filter(belongs_to=admin_id)
+            serialized_data = self.serializer_class(queryset, many=True, context={"retrieve": True}).data 
         return Response(serialized_data, status=status.HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):

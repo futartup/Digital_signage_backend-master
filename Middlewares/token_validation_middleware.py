@@ -44,9 +44,11 @@ routes_token_not_required = ['logout',
                              'shikha',
                              'dudu',
                              'create',
-                             'maadeuta']
+                             'maadeuta',
+                             'playlist']
 routes_token_not_required_on_methods = {
     '/api/signup/' : ['POST'],
+    '/api/playlist/': ['GET'],
 }
 
 

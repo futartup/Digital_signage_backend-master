@@ -144,6 +144,13 @@ class PlayListSerializer(ModelSerializer):
         super().__init__(*args, **kwargs)
         if 'retrieve' in self.context:
             self.fields['video'] = serializers.SerializerMethodField(read_only=True)
+        elif 'plain' in self.context:
+            self.fields['plain_video'] = serializers.SerializerMethodField(read_only=True)
+    
+    def get_plain_video(self, instance):
+        videos = instance.video.all()
+        serialized_video = VideoSerializer(videos, many=True).data
+        return serialized_video
     
     def get_video(self, instance):
         final_data = []
