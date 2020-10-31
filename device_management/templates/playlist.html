@@ -63,7 +63,7 @@
         <div class="container-player">
             <div id="mediaPlayer">
                 <!-- <div class="lds-ring" id=preload><div></div><div></div><div></div><div></div></div> -->
-                <video id='media-video' controls>
+                <video id='media-video' controls autoplay>
                     <source type='video/mp4'>
                     
                 </video>
@@ -134,7 +134,9 @@
     });
  
     function trans(source){
+        $('#mediaPlayer video source').pause();
         $('#mediaPlayer video source').attr('src', source);
+        $('#mediaPlayer video source').play();
     }
 </script>
 {%endblock%}
