@@ -14,7 +14,7 @@
 {% block dynamic %}
 <div class="container-fluid">
     <div class="d-sm-flex justify-content-between align-items-center mb-4">
-        <h3 class="text-dark mb-0">Playlist</h3>
+        <h3 class="text-dark mb-0">Playlist </h3>
         
         <a class="" role="" href="#"></a></div>
     <!-- <div class="row">
@@ -62,10 +62,10 @@
         <!--Video Player-->
         <div class="container-player">
             <div id="mediaPlayer">
-                <div class="lds-ring" id=preload><div></div><div></div><div></div><div></div></div>
-                <video id='media-video' preload controls>
+                <!-- <div class="lds-ring" id=preload><div></div><div></div><div></div><div></div></div> -->
+                <video id='media-video' controls>
                     <source type='video/mp4'>
-                    <source src='parrots.webm' type='video/webm'>
+                    
                 </video>
                 <!-- <div id="controls">
                     <button id=play><i class="fas fa-pause"></i></button>
@@ -112,7 +112,7 @@
                     data.forEach((d, idx) => {
                         // Construct card content    
                         const content = `
-                                        <div id="${d.id}" class="video">
+                                        <div id="${d.id}" class="video" onclick="trans('${d.source}');">
                                         <div class="video-imagen">
                                         <img src="${d.source}">
                                         </div>
@@ -130,88 +130,11 @@
                 error: function(data, status, error){
                     alert(error);
                 }
-    })
-        // var getVideos= getJSON('/api/playlist/?org_uuid=',function(response)
-        //                {
-        //                 videos=response;
-        //                 loadList(videos)
-        //                 //higlight(currentTrack);
-        // });
-
-        // function getJSON(url, callback){
-        //     var request=new XMLHttpRequest();
-        //     var response = JSON.parse(localStorage.getItem('response'));
-        //     url = url+ response.organization_uuid;
-        //     request.open('GET',url);
-        //     request.onload=function(){
-        //         if(request.status>=200&&request.status<400)
-        //         {          
-        //             var data=JSON.parse(request.responseText);      
-        //             callback(data);
-        //         }
-        //     };
-        //     request.onerror=function(){console.error("there was an error")};
-        //     request.send();
-        // }
-
-        // function loadList(playlist){
-        //     var domPlayList=document.getElementById('playlist'),fragmentList=document.createDocumentFragment();
-        //     for(let video of playlist)
-        //     fragmentList.appendChild(create(video))
-        //     domPlayList.appendChild(fragmentList)
-        //     videoNodes=document.querySelectorAll('.video');
-        // }
-        
+        });
     });
  
-    $('.video').click(function(){
-        alert("asdfdsfafds");
-    })
-    // $(document).ready(function() {
-    //     $.ajax({
-    //             url: '/api/playlist/',
-    //             method: "GET",
-    //             headers: {
-    //                 "Content-Type": "application/json",
-    //                 "Access-Control-Allow-Origin": "*",
-    //                 "Authorization": "Bearer " + localStorage.getItem("token"),
-    //             },
-    //             success: function(data, status){
-    //                 var playlist = $('#playlist').DataTable();
-    //                 var datas = []
-    //                 data.forEach(function(dd){
-    //                     temp_data = []
-    //                     temp_data.push(dd.id);
-    //                     temp_data.push(dd.name);
-    //                     temp_data.push(dd.video.total_video);
-    //                     temp_data.push(dd.video.devices.length);
-    //                     datas.push(temp_data);
-    //                 });
-    //                 playlist.rows.add(datas).draw();
-    //             },
-    //             error: function(data, status, error){
-    //                 alert(error);
-    //             }
-    //     })
-            
-    // });
-
-    // function deletePlaylist(devices, uuid, user) {
-    //     if (confirm("Do you really want to delete the playlist. It will be removed from the device") == true) {
-            
-    //         $.ajax({
-    //             url: '/api/playlist/'+uuid+ '/' + '?username=' + user,
-    //             type: "DELETE",
-    //             success: function(data, status){
-    //                 alert(status);
-    //             },
-    //             error: function(data, status, error){
-    //                 alert(error);
-    //             }
-    //         })
-    //     } else {
-    //         alert("Delete operation cancelled.")
-    //     }
-    // }
+    function trans(source){
+        $('#mediaPlayer video source').attr('src', source);
+    }
 </script>
 {%endblock%}
