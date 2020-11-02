@@ -13,6 +13,7 @@ from rest_framework_simplejwt import views as jwt_views
 from itertools import islice
 from django.contrib.auth.hashers import make_password
 from django.core.cache import cache
+from rest_framework.decorators import action
 
 
 # MQTT imports
@@ -92,7 +93,8 @@ class AdminViewSet(ModelViewSet):
             request.data['password'] = make_password(request.data['password'], None, 'md5')
             added_by = request.data.get('added_by', None)
             if request.GET['query']['superuser']:
-                request.data['topic'] = "{}/{}".format(request.data['organization_name'].replace(' ', '_'), request.data['organization_uuid'])
+                #request.data['topic'] = "{}/{}".format(request.data['organization_name'].replace(' ', '_'), request.data['organization_uuid'])
+                request.data['topic'] = 'vrquin'
             else:
                 added_by_obj = Admin.objects.get(id=added_by)
                 request.data['topic'] = added_by_obj.topic
@@ -406,14 +408,19 @@ class DeviceViewSet(ModelViewSet):
         if super_user:
             queryset = self.get_queryset().select_related("belongs_to").all()
         else:
-            queryset = self.get_queryset().select_related("belongs_to").filter(belongs_to__organization_uuid=organization_uuid)
+            queryset = self.get_queryset().select_related("belongs_to").filter(belongs_to__organization_uuid=organization_uuid,
+                                                                               subscribed=True)
         final_result = [ {
+            'id': x.id,
             'device_name': x.name,
             'status': x.status,
             'topic': x.belongs_to.topic,
             'uuid': x.uuid,
             'added_on': x.added_on,
             'message': x.callback_message,
+            'belongs_to': x.belongs_to.id,
+            'subscribed': x.subscribed,
+            'organization_name': x.belongs_to.organization_name,
         } for x in queryset]
         return Response(final_result, status=status.HTTP_200_OK)
 
@@ -430,10 +437,46 @@ class DeviceViewSet(ModelViewSet):
             hostname = os.environ['MQTT_HOSTNAME']
             admin_id = Admin.objects.get(id=request.data.get("belongs_to"))
             Device.objects.create(name=request.data.get("name"),
-                                  belongs_to=admin_id)
+                                  belongs_to=admin_id,
+                                  subscribed=True)
             #publish.single(topic, {"devices": device, "message": message}.__repr__(), hostname=hostname)
             return Response({"status": "success", "message": "published {}".format(message)},
                             status=status.HTTP_200_OK)
         else:
             return Response({"status": "success", "message": "you are not allowed to add devices"},
                             status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+    def partial_update(self, request, *args, **kwargs):
+        obj = self.get_object()
+        serializer = self.get_serializer(instance=obj, data=request.data, partial=True)
+        if serializer.is_valid(raise_exception=True):
+            obj = serializer.save()
+            if 'subscribed' in request.data and request.data['subscribed'] == True:
+                message = 201
+            elif 'subscribed' in request.data and request.data['subscribed'] == False:
+                message = 202
+            elif 'status' in request.data and request.data['status'] == True:
+                message = 203
+            elif 'status' in request.data and request.data['status'] == False:
+                message = 204
+            publish.single(obj.belongs_to.topic, 
+                    {
+                        "devices": obj.uuid.__str__(), 
+                        "message": message,
+                    }.__repr__())
+            return Response({'status': True}, status=status.HTTP_200_OK)
+        else:
+            return Response({'status': True}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    # @action(detail=False, methods=['PATCH'])
+    # def manage(self, request, *args, **kwargs):
+    #     device_id = request.GET.get('device_id')
+    #     admin_id = request.GET.get('admin_id')
+    #     device_obj = self.get_queryset().filter(id=device_id, belongs_to=admin_id)
+    #     device_obj.subscribed = False
+    #     serializer = self.get_serializer(instance=device_obj, data={'subscribed': True}, partial=True)
+    #     if serializer.is_valid(raise_exception=True):
+    #         obj = serializer.save()
+    #         return Response({'status': True}, status=status.HTTP_200_OK)
+    #     else:
+    #         return Response({'status': True}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

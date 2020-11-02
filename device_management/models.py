@@ -81,6 +81,14 @@ class Device(models.Model):
     modified_on = models.DateTimeField(default=dt.now, null=True)
     name = models.CharField(max_length=50, blank=True, null=True, verbose_name="Given name to the device")
     callback_message = models.CharField(max_length=50, blank=True, null=True, verbose_name="Message from device onboard")
+    subscribed = models.BooleanField(default=False)
+    product_id = models.CharField(max_length=20, blank=True, null=True)
+    version = models.CharField(max_length=10, blank=True, null=True)
+    manufacturer = models.CharField(max_length=20, blank=True, null=True)
+    model = models.CharField(max_length=50, blank=True, null=True)
+    manufacturing_data = models.DateTimeField(default=dt.now, null=True)
+    warranty = models.DateTimeField(default=dt.now, null=True)
+    description = models.TextField(blank=True, null=True)
     #device_image = models.ImageField(upload_to=thumbnail_user_directory_path)
 
     # Foreign Keys

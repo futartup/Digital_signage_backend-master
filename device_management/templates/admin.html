@@ -18,8 +18,70 @@
     
 <div class="row">
     <div class="col-lg-6 mb-4">
-        
-        
+        <!--Device Add Modal-->
+        <div class="modal fade" id="modalAddDevice" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body mx-3">
+                <h4 class="modal-title w-100 font-weight-bold">Add Device</h4>
+                <h6>The device will be assigned to the user</h6>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+                </div>
+
+                <input type="hidden" id="userid" class="form-control validate">
+
+                <div class="modal-body mx-3">
+                <div class="md-form mb-5">
+                <input type="text" id="devicename" class="form-control validate">
+                <label data-error="wrong" data-success="right" for="defaultForm-email">Device Name</label>
+                </div>
+
+                <div class="md-form mb-4">
+                <input type="text" id="productid" class="form-control validate">
+                <label data-error="wrong" data-success="right" for="defaultForm-pass">Product ID</label>
+                </div>
+
+                <div class="md-form mb-4">
+                <input type="text" id="version" class="form-control validate">
+                <label data-error="wrong" data-success="right" for="defaultForm-pass">Version</label>
+                </div>
+
+                <div class="md-form mb-4">
+                <input type="text" id="manufacturer" class="form-control validate">
+                <label data-error="wrong" data-success="right" for="defaultForm-pass">Manufacturer</label>
+                </div>
+
+                <div class="md-form mb-4">
+                <input type="text" id="model" class="form-control validate">
+                <label data-error="wrong" data-success="right" for="defaultForm-pass">Model</label>
+                </div>
+
+                <div class="md-form mb-4">
+                <input type="text" id="manfdate" class="form-control validate" placeholder="2020-30-01">
+                <label data-error="wrong" data-success="right" for="defaultForm-pass">Manufaturing Date</label>
+                </div>
+
+                <div class="md-form mb-4">
+                <input type="text" id="warranty" class="form-control validate" placeholder="2020-30-01">
+                <label data-error="wrong" data-success="right" for="defaultForm-pass">Warranty</label>
+                </div>
+
+                <div class="md-form mb-4">
+                <textarea type="" id="description" class="form-control validate"></textarea>
+                <label data-error="wrong" data-success="right" for="defaultForm-pass">Description</label>
+                </div>
+
+            </div>
+            <div class="modal-footer d-flex justify-content-center">
+                <button class="btn btn-default" id="submit">Submit</button>
+            </div>
+            </div>
+        </div>
+        </div>
+        <!-------------------->
     </div>
     <div class="col">
         <div class="row">
@@ -39,6 +101,7 @@
             var columns = [
                 { title: "Name"},
                 { title: "Username" },
+                { title: "Topic"},
                 { title: "Added On" },
                 { title: "Status" },
                 { title: "Organization Name" },
@@ -72,11 +135,13 @@
                         temp_data = []
                         temp_data.push(dd.first_name + ' ' + dd.last_name);
                         temp_data.push(dd.username);
+                        temp_data.push(dd.topic);
                         temp_data.push(dd.date_joined);
                         temp_data.push(dd.is_active);
                         temp_data.push(dd.organization_name);
                         if (stored_response.superuser){
-                            temp_data.push(`<button type="button" class="btn btn-dark" onclick="assignDevice('${dd.topic}', ${dd.id}, '${dd.subject_name}');">Assign Device</button>`)
+                            //modalAddDevicetemp_data.push(`<button type="button" class="btn btn-dark" onclick="assignDevice('${dd.topic}', ${dd.id}, '${dd.subject_name}');">Assign Device</button>`)
+                            temp_data.push(`<button type="button" class="btn btn-dark" data-toggle="modal" data-target="#modalAddDevice" data-id="${dd.id}">Assign Device</button>`)
                         }
                         datas.push(temp_data);
                     });
@@ -118,6 +183,57 @@
             })
         }
     }
+
+    $('#modalAddDevice').on('show.bs.modal', function (e) {
+        //var button = $(event.relatedTarget);
+        //var id = button.data('data-id');
+        //$('#userid').value = id;
+        var id = $(e.relatedTarget).attr('data-id');
+        $('#submit').click(function(){
+            var device_name = document.getElementById('devicename').value;
+            var product_id = document.getElementById('productid').value;
+            var version = document.getElementById('version').value;
+            var manufacturer = document.getElementById('manufacturer').value;
+            var model = document.getElementById('model').value;
+            var manfdate = document.getElementById('manfdate').value;
+            var warranty = document.getElementById('warranty').value;
+            var description = document.getElementById('description').value;
+            if (device_name == "" & product_id == "" & version == "" & manufacturer == "" & 
+                model == "" & manfdate == "" & warranty == "" & description == ""){
+                    alert("Please input all the fields");
+            }
+            else{
+                $.ajax({
+                    url: '/api/device/',
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Access-Control-Allow-Origin": "*",
+                        "Authorization": "Bearer " + localStorage.getItem("token"),
+                    },
+                    data: JSON.stringify({
+                        'name': device_name,
+                        'product_id': product_id,
+                        'version': version,
+                        'manufacturer': manufacturer,
+                        'model': model,
+                        'manufacturing_data': manfdate,
+                        'warranty': warranty,
+                        'description': description,
+                        'belongs_to': id,
+                    }),
+                    success: function(data, status){
+                        alert("Successfully added device");
+                    },
+                    error: function(data, status, error){
+                        alert(error);
+                    }
+                });
+            }
+        });
+    });
+
+    
     
 </script>
 {%endblock%}
