@@ -92,6 +92,7 @@
                 { title: "Device UUID" },
                 { title: "Unsubscribe/Subscribe" },
                 { title: "Power On/Off" },
+                { title: "Delete"},
                 { title: "Status"},
                 { title: "Added On"},
                 { title: "Belongs To"},
@@ -135,6 +136,7 @@
                     else{
                         temp_data.push(`<button type="button" class="btn btn-dark" onclick="manage('${d.topic}', '${d.uuid}', true, 'status');">On</button>`);
                     }
+                    temp_data.push(`<button type="button" class="btn btn-dark" onclick="delete_device('${d.topic}', '${d.uuid}');">Delete</button>`);
                 }
                 if (d.status){
                     temp_data.push(`<a href="#" class="badge badge-danger">On</a>`);
@@ -187,6 +189,24 @@
                 }
         });
         return result;
+    }
+
+    // Function to subscribe and unsubscribe the device from the admin
+    function delete_device(topic, device_uuid){
+        var headers = {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE",
+                    "Authorization": "Bearer " + localStorage.getItem("token"),
+        };
+        url = `/api/device/${device_uuid}/`;
+        var request = new XMLHttpRequest();
+        request.open('DELETE', url, false);
+        request.setRequestHeader("Content-type","application/json");
+        request.setRequestHeader("Authorization","Bearer " + localStorage.getItem("token"));
+        request.setRequestHeader("Access-Control-Allow-Origin", "*");
+        request.send();
+        alert('Successfully deleted the device from the system.');
     }
 </script>
 {%endblock%}

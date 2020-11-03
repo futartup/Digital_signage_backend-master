@@ -105,7 +105,9 @@
                 { title: "Added On" },
                 { title: "Status" },
                 { title: "Organization Name" },
-                { title: "Assign Device" }
+                { title: "Assign Device" },
+                { title: "Make Active/Inactive"},
+                // { title: "Delete"},
             ]
         }
         else{
@@ -142,6 +144,13 @@
                         if (stored_response.superuser){
                             //modalAddDevicetemp_data.push(`<button type="button" class="btn btn-dark" onclick="assignDevice('${dd.topic}', ${dd.id}, '${dd.subject_name}');">Assign Device</button>`)
                             temp_data.push(`<button type="button" class="btn btn-dark" data-toggle="modal" data-target="#modalAddDevice" data-id="${dd.id}">Assign Device</button>`)
+                            if (dd.is_active){
+                                temp_data.push(`<button type="button" class="btn btn-dark" onclick="manage(${dd.id}, false, 'is_active');">Make Inactive</button>`);
+                            }
+                            else{
+                                temp_data.push(`<button type="button" class="btn btn-dark" onclick="manage(${dd.id}, true, 'is_active');">Make Active</button>`);
+                            }
+                            // temp_data.push(`<button type="button" class="btn btn-dark" onclick="delete_admin(${dd.id});">Delete</button>`);
                         }
                         datas.push(temp_data);
                     });
@@ -233,7 +242,40 @@
         });
     });
 
+    // Function to subscribe and unsubscribe the device from the admin
+    function manage(admin_id, status, key){
+        var headers = {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE",
+                    "Authorization": "Bearer " + localStorage.getItem("token"),
+        };
+        url = `/api/users/${admin_id}/`;
+        var request = new XMLHttpRequest();
+        request.open('PATCH', url, false);
+        request.setRequestHeader("Content-type","application/json");
+        request.setRequestHeader("Authorization","Bearer " + localStorage.getItem("token"));
+        request.setRequestHeader("Access-Control-Allow-Origin", "*");
+        request.send(`{"${key}": ${status}}`);
+        alert('Success. All the people in this organization is made Inactive. Now they cannot login.');
+    }
     
-    
+    // Function to delete the admin
+    function delete_admin(topic, device_uuid){
+        var headers = {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE",
+                    "Authorization": "Bearer " + localStorage.getItem("token"),
+        };
+        url = `/api/users/${device_uuid}/`;
+        var request = new XMLHttpRequest();
+        request.open('DELETE', url, false);
+        request.setRequestHeader("Content-type","application/json");
+        request.setRequestHeader("Authorization","Bearer " + localStorage.getItem("token"));
+        request.setRequestHeader("Access-Control-Allow-Origin", "*");
+        request.send();
+        alert('Successfully deleted the admin from the system.');
+    }
 </script>
 {%endblock%}

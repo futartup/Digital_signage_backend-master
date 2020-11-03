@@ -90,7 +90,7 @@ class Device(models.Model):
     warranty = models.DateTimeField(default=dt.now, null=True)
     description = models.TextField(blank=True, null=True)
     #device_image = models.ImageField(upload_to=thumbnail_user_directory_path)
-
+    
     # Foreign Keys
     belongs_to = models.ForeignKey(Admin, on_delete=models.PROTECT, blank=True, null=True)
     video = models.ManyToManyField(Video, blank=True, null=True)

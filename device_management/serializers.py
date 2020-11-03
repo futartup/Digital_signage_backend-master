@@ -24,6 +24,7 @@ class TokenObtainPairPatchedSerializer(TokenObtainPairSerializer):
         token['superuser'] = user.is_superuser
         token['admin'] = user.is_staff
         token['organization_uuid'] = user.organization_uuid.__str__()
+        token['is_active'] = user.is_active
 
         return token
 

@@ -70,7 +70,7 @@ class TokenObtainPairPatchedView(jwt_views.TokenObtainPairView):
 class AdminViewSet(ModelViewSet):
     queryset =  Admin.objects.all()
     serializer_class = AdminSerializer
-    lookup_field = 'uuid'
+    lookup_field = 'id'
 
     def list(self, request, *args, **kwargs):
         super_user = request.GET['query']['superuser']
@@ -108,7 +108,25 @@ class AdminViewSet(ModelViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"status": "Failed", "message": e.__str__()}, status=status.HTTP_412_PRECONDITION_FAILED)
+
+    def partial_update(self, request, *args, **kwargs):
+        obj = self.get_object()
+        serializer = self.get_serializer(instance=obj, data=request.data, partial=True)
+
+        if serializer.is_valid(raise_exception=True):
+            obj = serializer.save()
+            queryset = self.get_queryset().filter(organization_uuid=obj.organization_uuid).update(is_active=request.data['is_active'])
+            return Response({'status': True}, status=status.HTTP_200_OK)
+        else:
+            return Response({'status': True}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
+    # def destroy(self, request, *args, **kwargs):
+    #     obj = self.get_object()
+    #     obj.video.clear()
+    #     obj.playtime.clear()
+    #     obj.delete()
+    #     return Response({'status': True}, status=status.HTTP_200_OK)
+
 
 class VideoViewSet(ModelViewSet):
     queryset =  Video.objects.all()
@@ -468,6 +486,12 @@ class DeviceViewSet(ModelViewSet):
         else:
             return Response({'status': True}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    def destroy(self, request, *args, **kwargs):
+        obj = self.get_object()
+        obj.video.clear()
+        obj.playtime.clear()
+        obj.delete()
+        return Response({'status': True}, status=status.HTTP_200_OK)
     # @action(detail=False, methods=['PATCH'])
     # def manage(self, request, *args, **kwargs):
     #     device_id = request.GET.get('device_id')

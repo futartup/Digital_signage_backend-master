@@ -80,13 +80,17 @@
                                 return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
                             }).join(''));
                             const token = JSON.parse(jsonPayload);
-                            localStorage.setItem("token", data.access);
-                            localStorage.setItem("response", JSON.stringify(data));
-                            window.location.href = "/dashboard";
-                           
+                            if (token.is_active){
+                                localStorage.setItem("token", data.access);
+                                localStorage.setItem("response", JSON.stringify(data));
+                                window.location.href = "/dashboard";
+                            }
+                            else{
+                                alert("Your account has been made Inactive by Superadmin. Please contact superadmin (vrquin@gmail.com) to make the account Active.")
+                            }
                         },
                         error: function(data, status, error){
-                            alert(JSON.stringify(data));
+                            alert("Your account has been made Inactive by Superadmin. Please contact superadmin (vrquin@gmail.com) to make the account Active. Or Check your username and password properly")
                         }
 
                     });
