@@ -1,60 +1,78 @@
-{% extends "base.html" %}
+{% extends "base_v1.html" %}
 {% load static %}
 {%block extra_css%}
 
 <link rel="stylesheet" href="{% static '/css/ocplayer.min.css' %}">
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
-<style>
-    .video-imagen > img {
-        height: 100%;
-        width: 78%;
-    }
-</style>
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"
+    integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
 {%endblock%}
+
+
 {% block dynamic %}
-<div class="container-fluid">
-    <div class="d-sm-flex justify-content-between align-items-center mb-4">
+<div class="d-sm-flex justify-content-between align-items-center mb-4">
+    <h3 class="text-dark mb-0"></h3>
+
+    <a class="" role="" href="#"></a>
+</div>
+<div class="row">
+    <div class="col-md-12 mb-4">
         <h3 class="text-dark mb-0">Playlist </h3>
-        
-        <a class="" role="" href="#"></a></div>
-    <div class="row">
-        <div class="col-md-12">
-                <table id="playlist" class="table table-striped table-bordered" cellspacing="0" width="100%">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Source</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        
-                    </tbody>
-                    <tfoot>
-                        
-                    </tfoot>
-                </table>
-            
+
+        <a class="" role="" href="#"></a>
+    </div>
+    <div class="col-md-4">
+        <div class="card mb-4">
+
+            <!--Card content-->
+            <div class="card-body">
+
+                <!-- List group links -->
+                <div class="list-group list-group-flush" id="playlist1">
+
+
+                </div>
+                <!-- List group links -->
+
+            </div>
+
         </div>
 
-        <div id="scheduleModal" class="modal fade" role="dialog">
-            <div class="modal-dialog">
-        
-            <div class="modal-content">
-                <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
+    </div>
+
+    <div class="col-md-8">
+        <div id="playlist-video">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="list-group list-group-flush" id="playlist2">
+
+
+                    </div>
+
                 </div>
-                <div class="modal-body">
-                    
-                </div>
-                <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-        
+
             </div>
         </div>
     </div>
-    
+
+    <div id="scheduleModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
 <div class="row">
     <div class="col-lg-12">
         <!-- <div class="container-player">
@@ -71,10 +89,9 @@
     </div>
     <div class="col">
         <div class="row">
-            
+
         </div>
     </div>
-</div>
 </div>
 </div>
 {%endblock%}
@@ -82,36 +99,82 @@
 {% block extra_js %}
 <!-- <script src="{% static '/js/ojcplayer.min.js' %}"></script> -->
 <script>
-    $(document).ready(function(){
-        var response = JSON.parse(localStorage.getItem('response'));
-        var table = $('#playlist').DataTable();
-        $.ajax({
-                url: '/api/playlist/?org_uuid='+response.organization_uuid,
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Access-Control-Allow-Origin": "*"
-                },
-                success: function(data, status){
-                    var result = [];
-                    data.forEach(function(dd){
-                        temp_data = []
-                        temp_data.push(dd.id);
-                        temp_data.push(`<img style="height: 50%; width: 40%" src='${dd.source}'>`);
-                        result.push(temp_data);
-                    });
-                    table.rows.add(result).draw();
-                },
-                error: function(data, status, error){
-                    alert(error);
-                }
-        });
+    var response = JSON.parse(localStorage.getItem('response'));
+
+    $(document).ready(function () {
+        make_api_call();
     });
- 
-    // function trans(source){
-    //     $('#mediaPlayer video source').stop();
-    //     $('#mediaPlayer video source').attr('src', source);
-    //     $('#mediaPlayer video source').submit();
-    // }
+
+    function displayPlaylist(playlist_id) {
+        make_api_call(playlist_id);
+    }
+
+    function deletePlaylist(playlist_uuid) {
+        $.ajax({
+            url: '/api/playlist/' + playlist_uuid + '/',
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+                "Authorization": "Bearer " + localStorage.getItem("token"),
+            },
+            success: function (data, status) {
+                location.reload;
+            },
+            error: function (data, status, error) {
+                alert(error);
+            }
+        });
+    }
+
+    function make_api_call(playlist_id = null) {
+        if (playlist_id) {
+            var url = '/api/playlist/?org_uuid=' + response.organization_uuid + '&playlist_id=' + playlist_id;
+        }
+        else {
+            var url = '/api/playlist/?org_uuid=' + response.organization_uuid
+        }
+        $.ajax({
+            url: url,
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*"
+            },
+            success: function (data, status) {
+                const container = document.getElementById('playlist1');
+                const container1 = document.getElementById('playlist2');
+                // container.innerHTML = '';
+                container1.innerHTML = '';
+                if (playlist_id == null) {
+                    data.forEach((d, idx) => {
+                        // Construct card content   
+                        const content = `<a class="list-group-item list-group-item-action waves-effect" onclick="displayPlaylist(${d.id});">${d.name}
+                                        <br>
+                                     </a>
+                                    `;
+                        // Append newyly created card element to the container
+                        container.innerHTML += content;
+                    });
+                }
+                data[0].video.videos.forEach((d) => {
+                    element = `<div class="col-md-2">
+                                <video width="220" height="140" controls>
+                                <source src="${d.video}" type="video/mp4">
+                                Your browser does not support the video tag.
+                                </video></div>
+                            `
+                    container1.innerHTML += element;
+                });
+                container1.innerHTML += `<button type="button" class="btn btn-dark btn-sm waves-effect waves-light" data-toggle="modal"
+                            onclick="deletePlaylist('${data[0].uuid}');">Delete
+                        </button>`;
+            },
+            error: function (data, status, error) {
+                alert(error);
+            }
+        });
+    }
+
 </script>
 {%endblock%}

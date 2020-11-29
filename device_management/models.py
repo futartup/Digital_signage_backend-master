@@ -13,39 +13,73 @@ from django.contrib.auth.hashers import make_password
 from .signals import *
 
 
+def logo_directory_path(instance, filename):
+    # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
+
+    file = "logo/user_{0}/{1}".format(instance.uuid, filename).replace(" ", "_")
+    if os.path.exists(os.path.join(settings.MEDIA_ROOT + "/" + os.path.join(file))):
+        os.remove(os.path.join(settings.MEDIA_ROOT + "/" + os.path.join(file)))
+    return "logo/user_{0}/{1}".format(instance.uuid, filename)
+
+
+def profile_directory_path(instance, filename):
+    # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
+
+    file = "profile/user_{0}/{1}".format(instance.uuid, filename).replace(" ", "_")
+    if os.path.exists(os.path.join(settings.MEDIA_ROOT + "/" + os.path.join(file))):
+        os.remove(os.path.join(settings.MEDIA_ROOT + "/" + os.path.join(file)))
+    return "profile/user_{0}/{1}".format(instance.uuid, filename)
+
+
 class Admin(AbstractUser):
     organization_uuid = models.UUIDField(blank=True, null=True)
     uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     last_login = models.DateTimeField(null=True)
     archived_on = models.DateTimeField(null=True, blank=True)
     restored_on = models.DateTimeField(null=True, blank=True)
-    organization_name = models.CharField(max_length=100, blank=True, null=True, verbose_name="Organization Name")
+    organization_name = models.CharField(
+        max_length=100, blank=True, null=True, verbose_name="Organization Name"
+    )
     topic = models.CharField(max_length=100, blank=True, null=True)
-    added_by = models.ForeignKey('self', on_delete=models.PROTECT, related_name="added_by_user", blank=True, null=True)
+    company_logo = models.FileField(
+        upload_to=logo_directory_path, blank=True, null=True
+    )
+    profile_photo = models.FileField(
+        upload_to=profile_directory_path, blank=True, null=True
+    )
+    added_by = models.ForeignKey(
+        "self",
+        on_delete=models.PROTECT,
+        related_name="added_by_user",
+        blank=True,
+        null=True,
+    )
 
     # def save(self, *args, **kwargs):
     #     self.password = make_password(self.password, None, 'md5')
     #     self.topic = "{}/{}".format(self.organization_name, self.organization_uuid)
     #     instance, created = super(Admin, self).save()
-        #create_auth_token.send(sender=self.__class__, instance=instance, created=created)
+    # create_auth_token.send(sender=self.__class__, instance=instance, created=created)
 
 
 def user_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
-    
-    file = 'user_{0}/{1}'.format(instance.belongs_to.uuid, filename).replace(" ", "_")
-    if os.path.exists(os.path.join(settings.MEDIA_ROOT + '/' + os.path.join(file))):
-        os.remove(os.path.join(settings.MEDIA_ROOT + '/' + os.path.join(file)))
-    return 'user_{0}/{1}'.format(instance.belongs_to.uuid, filename)
-  
+
+    file = "user_{0}/{1}".format(instance.belongs_to.uuid, filename).replace(" ", "_")
+    if os.path.exists(os.path.join(settings.MEDIA_ROOT + "/" + os.path.join(file))):
+        os.remove(os.path.join(settings.MEDIA_ROOT + "/" + os.path.join(file)))
+    return "user_{0}/{1}".format(instance.belongs_to.uuid, filename)
+
 
 def thumbnail_user_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/thumbnails/user_<id>/<filename>
-    file = 'thumbnails/user_{0}/{1}'.format(instance.belongs_to.uuid, filename).replace(" ", "_")
-    if os.path.exists(os.path.join(settings.MEDIA_ROOT + '/' + os.path.join(file))):
-        os.remove(os.path.join(settings.MEDIA_ROOT + '/' + os.path.join(file)))
-    return 'thumbnails/user_{0}/{1}'.format(instance.belongs_to.uuid, filename)
-   
+    file = "thumbnails/user_{0}/{1}".format(instance.belongs_to.uuid, filename).replace(
+        " ", "_"
+    )
+    if os.path.exists(os.path.join(settings.MEDIA_ROOT + "/" + os.path.join(file))):
+        os.remove(os.path.join(settings.MEDIA_ROOT + "/" + os.path.join(file)))
+    return "thumbnails/user_{0}/{1}".format(instance.belongs_to.uuid, filename)
+
 
 class PlayTimeSchedule(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
@@ -70,7 +104,9 @@ class Video(models.Model):
 
     # Foreign Keys
     playtime = models.ManyToManyField(PlayTimeSchedule, blank=True, null=True)
-    belongs_to = models.ForeignKey(Admin, on_delete=models.PROTECT, blank=True, null=True)
+    belongs_to = models.ForeignKey(
+        Admin, on_delete=models.PROTECT, blank=True, null=True
+    )
 
 
 class Device(models.Model):
@@ -79,8 +115,12 @@ class Device(models.Model):
     added_on = models.DateTimeField(default=dt.now, null=True)
     removed_on = models.DateTimeField(default=dt.now, null=True)
     modified_on = models.DateTimeField(default=dt.now, null=True)
-    name = models.CharField(max_length=50, blank=True, null=True, verbose_name="Given name to the device")
-    callback_message = models.CharField(max_length=50, blank=True, null=True, verbose_name="Message from device onboard")
+    name = models.CharField(
+        max_length=50, blank=True, null=True, verbose_name="Given name to the device"
+    )
+    callback_message = models.CharField(
+        max_length=50, blank=True, null=True, verbose_name="Message from device onboard"
+    )
     subscribed = models.BooleanField(default=False)
     product_id = models.CharField(max_length=20, blank=True, null=True)
     version = models.CharField(max_length=10, blank=True, null=True)
@@ -89,10 +129,12 @@ class Device(models.Model):
     manufacturing_data = models.DateTimeField(default=dt.now, null=True)
     warranty = models.DateTimeField(default=dt.now, null=True)
     description = models.TextField(blank=True, null=True)
-    #device_image = models.ImageField(upload_to=thumbnail_user_directory_path)
-    
+    # device_image = models.ImageField(upload_to=thumbnail_user_directory_path)
+
     # Foreign Keys
-    belongs_to = models.ForeignKey(Admin, on_delete=models.PROTECT, blank=True, null=True)
+    belongs_to = models.ForeignKey(
+        Admin, on_delete=models.PROTECT, blank=True, null=True
+    )
     video = models.ManyToManyField(Video, blank=True, null=True)
     playtime = models.ManyToManyField(PlayTimeSchedule, blank=True, null=True)
 

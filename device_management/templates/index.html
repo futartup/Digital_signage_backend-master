@@ -1,58 +1,64 @@
-{% extends "base.html" %}
+{% extends "base_v1.html" %}
 {% block dynamic %}
-<div class="container-fluid">
+<div class="d-sm-flex justify-content-between align-items-center mb-4">
+    <h3 class="text-dark mb-0"></h3>
+</div>
+<div class="row">
     <div class="d-sm-flex justify-content-between align-items-center mb-4">
-        <h3 class="text-dark mb-0">Dashboard</h3></div>
-    <div class="row">
-        <div class="col-md-6 col-xl-3 mb-4">
-            <div class="card shadow border-left-primary py-2">
-                <div class="card-body">
-                    <div class="row align-items-center no-gutters">
-                        <div class="col mr-2">
-                            <div class="text-uppercase text-primary font-weight-bold text-xs mb-1"><span>Admins</span></div>
-                            <div class="text-dark font-weight-bold h5 mb-0"><span id="total_admins"></span></div>
+        <h3 class="text-dark mb-0">Dashboard</h3>
+    </div>
+    <div class="col-md-12 col-xl-3 mb-4">
+        <div class="card shadow border-left-primary py-2">
+            <div class="card-body">
+                <div class="row align-items-center no-gutters">
+                    <div class="col mr-2">
+                        <div class="text-uppercase text-primary font-weight-bold text-xs mb-1"><span>Admins</span>
                         </div>
-                        <div class="col-auto"><i class="fas fa-calendar fa-2x text-gray-300"></i></div>
+                        <div class="text-dark font-weight-bold h5 mb-0"><span id="total_admins"></span></div>
                     </div>
+                    <div class="col-auto"><i class="fas fa-calendar fa-2x text-gray-300"></i></div>
                 </div>
             </div>
         </div>
-        <div class="col-md-6 col-xl-3 mb-4">
-            <div class="card shadow border-left-success py-2">
-                <div class="card-body">
-                    <div class="row align-items-center no-gutters">
-                        <div class="col mr-2">
-                            <div class="text-uppercase text-success font-weight-bold text-xs mb-1"><span>Devices</span></div>
-                            <div class="text-dark font-weight-bold h5 mb-0"><span id="total_devices"></span></div>
+    </div>
+    <div class="col-md-6 col-xl-3 mb-4">
+        <div class="card shadow border-left-success py-2">
+            <div class="card-body">
+                <div class="row align-items-center no-gutters">
+                    <div class="col mr-2">
+                        <div class="text-uppercase text-success font-weight-bold text-xs mb-1"><span>Devices</span>
                         </div>
-                        <div class="col-auto"><i class="fas fa-dollar-sign fa-2x text-gray-300"></i></div>
+                        <div class="text-dark font-weight-bold h5 mb-0"><span id="total_devices"></span></div>
                     </div>
+                    <div class="col-auto"><i class="fas fa-dollar-sign fa-2x text-gray-300"></i></div>
                 </div>
             </div>
         </div>
-        <div class="col-md-6 col-xl-3 mb-4">
-            <div class="card shadow border-left-info py-2">
-                <div class="card-body">
-                    <div class="row align-items-center no-gutters">
-                        <div class="col mr-2">
-                            <div class="text-uppercase text-info font-weight-bold text-xs mb-1"><span>Devices with videos</span></div>
-                            <div class="row no-gutters align-items-center">
-                                <div class="col-auto">
-                                    <div class="text-dark font-weight-bold h5 mb-0 mr-3"><span id="videos_assigned_devices"></span></div>
-                                </div>
-                                <!-- <div class="col">
+    </div>
+    <div class="col-md-6 col-xl-3 mb-4">
+        <div class="card shadow border-left-info py-2">
+            <div class="card-body">
+                <div class="row align-items-center no-gutters">
+                    <div class="col mr-2">
+                        <div class="text-uppercase text-info font-weight-bold text-xs mb-1"><span>videos</span></div>
+                        <div class="row no-gutters align-items-center">
+                            <div class="col-auto">
+                                <div class="text-dark font-weight-bold h5 mb-0 mr-3"><span
+                                        id="videos_assigned_devices"></span></div>
+                            </div>
+                            <!-- <div class="col">
                                     <div class="progress progress-sm">
                                         <div class="progress-bar bg-info" aria-valuenow="{{videos_assigned_devices}}" aria-valuemin="0" aria-valuemax="100" style="width: {{videos_assigned_devices}}%;"><span class="sr-only">{{videos_assigned_devices}}</span></div>
                                     </div>
                                 </div> -->
-                            </div>
                         </div>
-                        <div class="col-auto"><i class="fas fa-clipboard-list fa-2x text-gray-300"></i></div>
                     </div>
+                    <div class="col-auto"><i class="fas fa-clipboard-list fa-2x text-gray-300"></i></div>
                 </div>
             </div>
         </div>
-        <!-- <div class="col-md-6 col-xl-3 mb-4">
+    </div>
+    <!-- <div class="col-md-6 col-xl-3 mb-4">
             <div class="card shadow border-left-warning py-2">
                 <div class="card-body">
                     <div class="row align-items-center no-gutters">
@@ -66,8 +72,8 @@
                 </div>
             </div>
         </div> -->
-    </div>
-    <!-- <div class="row">
+</div>
+<!-- <div class="row">
         <div class="col-lg-7 col-xl-8">
             <div class="card shadow mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
@@ -230,39 +236,38 @@
     </div> -->
 </div>
 </div>
-</div>
 {%endblock%}
 
 
 {% block extra_js %}
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
         const url_1 = '/api/users/'
         const url_2 = '/api/device/'
         const url_3 = '/api/video/'
 
         const headers = {
-                "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "*",
-                "Authorization": "Bearer " + localStorage.getItem("token"),
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "Authorization": "Bearer " + localStorage.getItem("token"),
         }
-        
-        $.when( 
-            $.ajax( {url: url_1, method:"GET", headers: headers}), 
-            $.ajax( {url: url_2, method:"GET", headers: headers}),
-            $.ajax( {url: url_3, method:"GET", headers: headers}),
-        )
-        .done(function( a1, a2, a3 ) {
-            $('#total_admins').text(a1[0].length);
-            $('#total_devices').text(a2[0].length);
-            $('#videos_assigned_devices').text(a3[0].length);
 
-            localStorage.setItem('users', JSON.stringify(a1[0]));
-            localStorage.setItem('devices', JSON.stringify(a2[0]));
-            localStorage.setItem('videos', JSON.stringify(a3[0]));
-        // a1 and a2 are arguments resolved for the url1 and url2 ajax requests, respectively.
-        // Each argument is an array with the following structure: [ data, statusText, jqXHR ]
-        });
+        $.when(
+            $.ajax({ url: url_1, method: "GET", headers: headers }),
+            $.ajax({ url: url_2, method: "GET", headers: headers }),
+            $.ajax({ url: url_3, method: "GET", headers: headers }),
+        )
+            .done(function (a1, a2, a3) {
+                $('#total_admins').text(a1[0].length);
+                $('#total_devices').text(a2[0].length);
+                $('#videos_assigned_devices').text(a3[0].length);
+
+                localStorage.setItem('users', JSON.stringify(a1[0]));
+                localStorage.setItem('devices', JSON.stringify(a2[0]));
+                localStorage.setItem('videos', JSON.stringify(a3[0]));
+                // a1 and a2 are arguments resolved for the url1 and url2 ajax requests, respectively.
+                // Each argument is an array with the following structure: [ data, statusText, jqXHR ]
+            });
     });
 </script>
 {%endblock%}

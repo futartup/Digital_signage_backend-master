@@ -12,13 +12,13 @@ from cryptography.hazmat.primitives import serialization
 from rest_framework_jwt.utils import jwt_decode_handler
 
 
-#from Utility_functions.gps_logs_utils import add_entry_exit_logs
+# from Utility_functions.gps_logs_utils import add_entry_exit_logs
 
-#log = logging.getLogger(__name__)
+# log = logging.getLogger(__name__)
 
 
 def intarr2long(arr):
-    return int(''.join(["%02x" % byte for byte in arr]), 16)
+    return int("".join(["%02x" % byte for byte in arr]), 16)
 
 
 def base64_to_long(data):
@@ -26,36 +26,44 @@ def base64_to_long(data):
         data = data.encode("ascii")
 
     # urlsafe_b64decode will happily convert b64encoded data
-    _d = base64.urlsafe_b64decode(bytes(data) + b'==')
-    return intarr2long(struct.unpack('%sB' % len(_d), _d))
+    _d = base64.urlsafe_b64decode(bytes(data) + b"==")
+    return intarr2long(struct.unpack("%sB" % len(_d), _d))
+
 
 from django.http.response import JsonResponse
 from django.conf import settings
 
 
-routes_token_not_required = ['logout',
-                             'admins',
-                             'api-token-auth', 
-                             'token', 
-                             'media', 
-                             'login', 
-                             'dashboard',
-                             'anup',
-                             'shikha',
-                             'dudu',
-                             'create',
-                             'maadeuta',
-                             'playlist']
-routes_token_not_required_on_methods = {
-    '/api/signup/' : ['POST'],
-    '/api/playlist/': ['GET'],
-}
+routes_token_not_required = [
+    "lakshmi",
+    "logout",
+    "admins",
+    "api-token-auth",
+    "token",
+    "media",
+    "login",
+    "dashboard",
+    "anup",
+    "shikha",
+    "dudu",
+    "create",
+    "maadeuta",
+    "playlist",
+    "profile",
+]
 
+routes_token_not_required_on_methods = {
+    "/api/signup/": ["POST"],
+    "/api/playlist/": ["GET"],
+}
 
 
 def check_on_particular_method(request):
     if request.get_full_path() in routes_token_not_required_on_methods.keys():
-        return not (request.method in routes_token_not_required_on_methods[request.get_full_path()])
+        return not (
+            request.method
+            in routes_token_not_required_on_methods[request.get_full_path()]
+        )
     else:
         return False
 
@@ -63,9 +71,12 @@ def check_on_particular_method(request):
 def check_if_middleware_required(request):
     end_point_res = True
     for route in routes_token_not_required:
-        if route in request.build_absolute_uri() or 'api' not in request.build_absolute_uri():
+        if (
+            route in request.build_absolute_uri()
+            or "api" not in request.build_absolute_uri()
+        ):
             end_point_res = False
-    if request and request.path == '/':
+    if request and request.path == "/":
         return False
     return end_point_res
 
@@ -74,10 +85,9 @@ class TokenValidationMiddleware(object):
     def __init__(self, get_response):
         self.get_response = get_response
 
-    #@add_entry_exit_logs
+    # @add_entry_exit_logs
     def __call__(self, request):
-        if check_if_middleware_required(request) or \
-                check_on_particular_method(request):
+        if check_if_middleware_required(request) or check_on_particular_method(request):
             decoded_token = {}
             if "username" in request.GET:
                 # if cache.__contains__(request.GET.get("username")):
@@ -86,15 +96,18 @@ class TokenValidationMiddleware(object):
                 #     return JsonResponse(data={
                 #         "code": "Username is not logged in",
                 #         "description": "Authorization header is expected"},
-                #         status=401) 
+                #         status=401)
                 pass
             else:
-                auth = request.META.get('HTTP_AUTHORIZATION')
+                auth = request.META.get("HTTP_AUTHORIZATION")
                 if not auth:
-                    return JsonResponse(data={
-                        "code": "authorization_header_missing",
-                        "description": "Authorization header is expected"},
-                        status=401)
+                    return JsonResponse(
+                        data={
+                            "code": "authorization_header_missing",
+                            "description": "Authorization header is expected",
+                        },
+                        status=401,
+                    )
                 # parts = auth.split()
                 # if parts[0].lower() != "bearer":
                 #     return JsonResponse(
@@ -112,14 +125,15 @@ class TokenValidationMiddleware(object):
                 #             "Authorization header must be Bearer token"},
                 #         status=401)
 
-                token = auth.split(' ')[1]
+                token = auth.split(" ")[1]
 
                 # Confirm A JSON Web Token (JWT) includes three sections
-                token_parts = token.split('.')
+                token_parts = token.split(".")
                 if len(token_parts) != 3:
-                    return JsonResponse(data={"code": "invalid_header",
-                                            "description": "Invalid Token"},
-                                        status=401)
+                    return JsonResponse(
+                        data={"code": "invalid_header", "description": "Invalid Token"},
+                        status=401,
+                    )
 
                 # Match the public Keys
                 # jwt_headers = jwt.get_unverified_header(token)
@@ -144,23 +158,26 @@ class TokenValidationMiddleware(object):
                 #     format=serialization.PublicFormat.SubjectPublicKeyInfo)
 
                 try:
-                #     log.info("Validating Token %s with AUD %s ISS %s " %
-                #              (token, settings.AUDIENCE, settings.ISS))
-                #     decoded_token = jwt.decode(jwt=token, verify=False)
+                    #     log.info("Validating Token %s with AUD %s ISS %s " %
+                    #              (token, settings.AUDIENCE, settings.ISS))
+                    #     decoded_token = jwt.decode(jwt=token, verify=False)
                     # have commented below till UI is ready with refresh
                     # token changes
                     decoded_token = jwt_decode_handler(token)
                 except jwt.ExpiredSignatureError as e:
-                    return JsonResponse(data={"code": "invalid_header",
-                                            "description": "Token Expired:"
-                                                            " %s" % str(e)},
-                                        status=401)
+                    return JsonResponse(
+                        data={
+                            "code": "invalid_header",
+                            "description": "Token Expired:" " %s" % str(e),
+                        },
+                        status=401,
+                    )
             if not request.GET._mutable:
                 request.GET._mutable = True
-                #if bool(decoded_token):
-                request.GET['query'] = decoded_token
-               
-                    #request.GET['query'] = userdata
+                # if bool(decoded_token):
+                request.GET["query"] = decoded_token
+
+                # request.GET['query'] = userdata
 
             # log.info("Token Validated user -  %s, %s - cognito id  %s ." %
             #          (decoded_token['given_name'],
@@ -172,4 +189,3 @@ class TokenValidationMiddleware(object):
         else:
             response = self.get_response(request)
             return response
-

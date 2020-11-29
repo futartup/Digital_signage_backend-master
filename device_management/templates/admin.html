@@ -1,173 +1,183 @@
-{% extends "base.html" %}
+{% extends "base_v1.html" %}
 {% block dynamic %}
-<div class="container-fluid">
+<div class="d-sm-flex justify-content-between align-items-center mb-4">
+    <h3 class="text-dark mb-0"><span class="badge badge-info badge-counter"></span>
+    </h3>
+</div>
+<div class="row">
     <div class="d-sm-flex justify-content-between align-items-center mb-4">
-        <h3 class="text-dark mb-0">Admins <span class="badge badge-info badge-counter" id="total-admins-badge"></span></h3></div>
-    <div class="row">
-        <div class="col-md-12">
-                <table id="admin" class="table table-striped table-bordered" cellspacing="0" width="100%">
-                    <thead>
-                        <tr>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
-        </div>
+        <h3 class="text-dark mb-0">Admins <span class="badge badge-info badge-counter" id="total-admins-badge"></span>
+        </h3>
     </div>
-    
+    <div class="col-md-12">
+        <table id="admin" class="table table-striped table-bordered" cellspacing="0" width="100%">
+            <thead>
+                <tr>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+</div>
+
 <div class="row">
     <div class="col-lg-6 mb-4">
         <!--Device Add Modal-->
         <div class="modal fade" id="modalAddDevice" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-body mx-3">
-                <h4 class="modal-title w-100 font-weight-bold">Add Device</h4>
-                <h6>The device will be assigned to the user</h6>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-                </button>
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-body mx-3">
+                        <h4 class="modal-title w-100 font-weight-bold">Add Device</h4>
+                        <h6>The device will be assigned to the user</h6>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+
+                    <input type="hidden" id="userid" class="form-control validate">
+
+                    <div class="modal-body mx-3">
+                        <div class="md-form mb-5">
+                            <input type="text" id="devicename" class="form-control validate">
+                            <label data-error="wrong" data-success="right" for="defaultForm-email">Device
+                                Name</label>
+                        </div>
+
+                        <div class="md-form mb-4">
+                            <input type="text" id="productid" class="form-control validate">
+                            <label data-error="wrong" data-success="right" for="defaultForm-pass">Product ID</label>
+                        </div>
+
+                        <div class="md-form mb-4">
+                            <input type="text" id="version" class="form-control validate">
+                            <label data-error="wrong" data-success="right" for="defaultForm-pass">Version</label>
+                        </div>
+
+                        <div class="md-form mb-4">
+                            <input type="text" id="manufacturer" class="form-control validate">
+                            <label data-error="wrong" data-success="right" for="defaultForm-pass">Manufacturer</label>
+                        </div>
+
+                        <div class="md-form mb-4">
+                            <input type="text" id="model" class="form-control validate">
+                            <label data-error="wrong" data-success="right" for="defaultForm-pass">Model</label>
+                        </div>
+
+                        <div class="md-form mb-4">
+                            <input type="text" id="manfdate" class="form-control validate" placeholder="2020-30-01">
+                            <label data-error="wrong" data-success="right" for="defaultForm-pass">Manufaturing
+                                Date</label>
+                        </div>
+
+                        <div class="md-form mb-4">
+                            <input type="text" id="warranty" class="form-control validate" placeholder="2020-30-01">
+                            <label data-error="wrong" data-success="right" for="defaultForm-pass">Warranty</label>
+                        </div>
+
+                        <div class="md-form mb-4">
+                            <textarea type="" id="description" class="form-control validate"></textarea>
+                            <label data-error="wrong" data-success="right" for="defaultForm-pass">Description</label>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer d-flex justify-content-center">
+                        <button class="btn btn-default" id="submit">Submit</button>
+                    </div>
                 </div>
-
-                <input type="hidden" id="userid" class="form-control validate">
-
-                <div class="modal-body mx-3">
-                <div class="md-form mb-5">
-                <input type="text" id="devicename" class="form-control validate">
-                <label data-error="wrong" data-success="right" for="defaultForm-email">Device Name</label>
-                </div>
-
-                <div class="md-form mb-4">
-                <input type="text" id="productid" class="form-control validate">
-                <label data-error="wrong" data-success="right" for="defaultForm-pass">Product ID</label>
-                </div>
-
-                <div class="md-form mb-4">
-                <input type="text" id="version" class="form-control validate">
-                <label data-error="wrong" data-success="right" for="defaultForm-pass">Version</label>
-                </div>
-
-                <div class="md-form mb-4">
-                <input type="text" id="manufacturer" class="form-control validate">
-                <label data-error="wrong" data-success="right" for="defaultForm-pass">Manufacturer</label>
-                </div>
-
-                <div class="md-form mb-4">
-                <input type="text" id="model" class="form-control validate">
-                <label data-error="wrong" data-success="right" for="defaultForm-pass">Model</label>
-                </div>
-
-                <div class="md-form mb-4">
-                <input type="text" id="manfdate" class="form-control validate" placeholder="2020-30-01">
-                <label data-error="wrong" data-success="right" for="defaultForm-pass">Manufaturing Date</label>
-                </div>
-
-                <div class="md-form mb-4">
-                <input type="text" id="warranty" class="form-control validate" placeholder="2020-30-01">
-                <label data-error="wrong" data-success="right" for="defaultForm-pass">Warranty</label>
-                </div>
-
-                <div class="md-form mb-4">
-                <textarea type="" id="description" class="form-control validate"></textarea>
-                <label data-error="wrong" data-success="right" for="defaultForm-pass">Description</label>
-                </div>
-
             </div>
-            <div class="modal-footer d-flex justify-content-center">
-                <button class="btn btn-default" id="submit">Submit</button>
-            </div>
-            </div>
-        </div>
         </div>
         <!-------------------->
     </div>
     <div class="col">
         <div class="row">
-            
+
         </div>
     </div>
-</div>
 </div>
 </div>
 {%endblock%}
 
 {% block extra_js %}
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
         var stored_response = JSON.parse(localStorage.getItem('response'));
-        if (stored_response.superuser){
+        if (stored_response.superuser) {
             var columns = [
-                { title: "Name"},
+                { title: "Name" },
                 { title: "Username" },
-                { title: "Topic"},
+                { title: "Topic" },
                 { title: "Added On" },
                 { title: "Status" },
                 { title: "Organization Name" },
+                { title: "Make Active/Inactive" },
                 { title: "Assign Device" },
-                { title: "Make Active/Inactive"},
                 // { title: "Delete"},
             ]
         }
-        else{
+        else {
             var columns = [
-                { title: "Name"},
+                { title: "Name" },
                 { title: "Username" },
                 { title: "Added On" },
                 { title: "Status" },
                 { title: "Organization Name" },
+                { title: "Make Active/Inactive" },
             ]
         }
         var table = $('#admin').DataTable({
             columns: columns,
         });
         $.ajax({
-                url: '/api/users/',
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Access-Control-Allow-Origin": "*",
-                    "Authorization": "Bearer " + localStorage.getItem("token"),
-                },
-                success: function(data, status){
-                    var datas = [];
-                    $('#total-admins-badge').text('Total Admins: ' + data.length);
-                    data.forEach(function(dd){
-                        temp_data = []
-                        temp_data.push(dd.first_name + ' ' + dd.last_name);
-                        temp_data.push(dd.username);
+            url: '/api/users/',
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+                "Authorization": "Bearer " + localStorage.getItem("token"),
+            },
+            success: function (data, status) {
+                var datas = [];
+                $('#total-admins-badge').text('Total Admins: ' + data.length);
+                data.forEach(function (dd) {
+                    temp_data = []
+                    temp_data.push(dd.first_name + ' ' + dd.last_name);
+                    temp_data.push(dd.username);
+                    if (stored_response.superuser) {
                         temp_data.push(dd.topic);
-                        temp_data.push(dd.date_joined);
-                        temp_data.push(dd.is_active);
-                        temp_data.push(dd.organization_name);
-                        if (stored_response.superuser){
-                            //modalAddDevicetemp_data.push(`<button type="button" class="btn btn-dark" onclick="assignDevice('${dd.topic}', ${dd.id}, '${dd.subject_name}');">Assign Device</button>`)
-                            temp_data.push(`<button type="button" class="btn btn-dark" data-toggle="modal" data-target="#modalAddDevice" data-id="${dd.id}">Assign Device</button>`)
-                            if (dd.is_active){
-                                temp_data.push(`<button type="button" class="btn btn-dark" onclick="manage(${dd.id}, false, 'is_active');">Make Inactive</button>`);
-                            }
-                            else{
-                                temp_data.push(`<button type="button" class="btn btn-dark" onclick="manage(${dd.id}, true, 'is_active');">Make Active</button>`);
-                            }
-                            // temp_data.push(`<button type="button" class="btn btn-dark" onclick="delete_admin(${dd.id});">Delete</button>`);
-                        }
-                        datas.push(temp_data);
-                    });
-                    table.rows.add(datas).draw();
-                },
-                error: function(data, status, error){
-                    alert(error);
-                }
-            })
+                    }
+                    temp_data.push(dd.date_joined);
+                    temp_data.push(dd.is_active);
+                    temp_data.push(dd.organization_name);
+                    //modalAddDevicetemp_data.push(`<button type="button" class="btn btn-dark" onclick="assignDevice('${dd.topic}', ${dd.id}, '${dd.subject_name}');">Assign Device</button>`)
+
+                    if (dd.is_active) {
+                        temp_data.push(`<button type="button" class="btn btn-dark" onclick="manage(${dd.id}, false, 'is_active');">Make Inactive</button>`);
+                    }
+                    else {
+                        temp_data.push(`<button type="button" class="btn btn-dark" onclick="manage(${dd.id}, true, 'is_active');">Make Active</button>`);
+                    }
+                    if (stored_response.superuser) {
+                        temp_data.push(`<button type="button" class="btn btn-dark" data-toggle="modal" data-target="#modalAddDevice" data-id="${dd.id}">Assign Device</button>`);
+                    }
+                    // temp_data.push(`<button type="button" class="btn btn-dark" onclick="delete_admin(${dd.id});">Delete</button>`);
+                    datas.push(temp_data);
+                });
+                table.rows.add(datas).draw();
+            },
+            error: function (data, status, error) {
+                alert(error);
+            }
+        })
     });
 
     function assignDevice(topic, id) {
         var device_name = window.prompt("Device name given to : ");
-        if (device_name == ''){
+        if (device_name == '') {
             alert("You have to give a name to device");
         }
-        else{
+        else {
             $.ajax({
                 url: '/api/device/',
                 method: "POST",
@@ -183,10 +193,10 @@
                     "belongs_to": id,
                     "status": false
                 }),
-                success: function(data, status){
+                success: function (data, status) {
                     alert(status);
                 },
-                error: function(data, status, error){
+                error: function (data, status, error) {
                     alert(error);
                 }
             })
@@ -198,7 +208,7 @@
         //var id = button.data('data-id');
         //$('#userid').value = id;
         var id = $(e.relatedTarget).attr('data-id');
-        $('#submit').click(function(){
+        $('#submit').click(function () {
             var device_name = document.getElementById('devicename').value;
             var product_id = document.getElementById('productid').value;
             var version = document.getElementById('version').value;
@@ -207,11 +217,11 @@
             var manfdate = document.getElementById('manfdate').value;
             var warranty = document.getElementById('warranty').value;
             var description = document.getElementById('description').value;
-            if (device_name == "" & product_id == "" & version == "" & manufacturer == "" & 
-                model == "" & manfdate == "" & warranty == "" & description == ""){
-                    alert("Please input all the fields");
+            if (device_name == "" & product_id == "" & version == "" & manufacturer == "" &
+                model == "" & manfdate == "" & warranty == "" & description == "") {
+                alert("Please input all the fields");
             }
-            else{
+            else {
                 $.ajax({
                     url: '/api/device/',
                     method: 'POST',
@@ -231,10 +241,10 @@
                         'description': description,
                         'belongs_to': id,
                     }),
-                    success: function(data, status){
+                    success: function (data, status) {
                         alert("Successfully added device");
                     },
-                    error: function(data, status, error){
+                    error: function (data, status, error) {
                         alert(error);
                     }
                 });
@@ -243,36 +253,37 @@
     });
 
     // Function to subscribe and unsubscribe the device from the admin
-    function manage(admin_id, status, key){
+    function manage(admin_id, status, key) {
         var headers = {
-                    "Content-Type": "application/json",
-                    "Access-Control-Allow-Origin": "*",
-                    "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE",
-                    "Authorization": "Bearer " + localStorage.getItem("token"),
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE",
+            "Authorization": "Bearer " + localStorage.getItem("token"),
         };
         url = `/api/users/${admin_id}/`;
         var request = new XMLHttpRequest();
         request.open('PATCH', url, false);
-        request.setRequestHeader("Content-type","application/json");
-        request.setRequestHeader("Authorization","Bearer " + localStorage.getItem("token"));
+        request.setRequestHeader("Content-type", "application/json");
+        request.setRequestHeader("Authorization", "Bearer " + localStorage.getItem("token"));
         request.setRequestHeader("Access-Control-Allow-Origin", "*");
         request.send(`{"${key}": ${status}}`);
-        alert('Success. All the people in this organization is made Inactive. Now they cannot login.');
+        alert('Success');
+        location.reload();
     }
-    
+
     // Function to delete the admin
-    function delete_admin(topic, device_uuid){
+    function delete_admin(topic, device_uuid) {
         var headers = {
-                    "Content-Type": "application/json",
-                    "Access-Control-Allow-Origin": "*",
-                    "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE",
-                    "Authorization": "Bearer " + localStorage.getItem("token"),
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE",
+            "Authorization": "Bearer " + localStorage.getItem("token"),
         };
         url = `/api/users/${device_uuid}/`;
         var request = new XMLHttpRequest();
         request.open('DELETE', url, false);
-        request.setRequestHeader("Content-type","application/json");
-        request.setRequestHeader("Authorization","Bearer " + localStorage.getItem("token"));
+        request.setRequestHeader("Content-type", "application/json");
+        request.setRequestHeader("Authorization", "Bearer " + localStorage.getItem("token"));
         request.setRequestHeader("Access-Control-Allow-Origin", "*");
         request.send();
         alert('Successfully deleted the admin from the system.');

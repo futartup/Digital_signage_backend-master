@@ -1,218 +1,144 @@
-{% extends "base.html" %}
-{% load static %}
-
-{% block extra_css %}
-<link rel="stylesheet" href="{% static '/fullcalendar-scheduler/main.css' %}">
-<style>
-    
-</style>
-{%endblock%}
-
-
+{% extends "base_v1.html" %}
 {% block dynamic %}
-<div class="container-fluid">
-    {% if video_update_status %}
-        <div class="card text-white bg-success shadow">
-            <div class="card-body">
-                <p class="m-0">{{video_update_status_message}}</p>
-            </div>
-        </div>
-    {% endif %}
-    <div class="d-sm-flex justify-content-between align-items-center mb-4">
-        <h3 class="text-dark mb-0">Videos<span class="badge badge-info badge-counter" id="total-videos"></span></h3>
-            <a class="btn btn-primary btn-sm d-none d-sm-inline-block" role="button" data-toggle="modal" data-target="#myModal">
-                <i class="fas fa-download fa-sm text-white-50"></i>&nbsp;Upload Video
-            </a>
-    </div>
-    <div class="row">
-        <div class="col-lg-3 mb-4 scrollbar square scrollbar-lady-lips thin" id="external-events" 
-             data-event='{"id": {{video.id}}, "uuid": {{video.uuid}}"}'>
-            <div class="card panels-card">
-                <div class="rounded-top grey lighten-2 dark-grey-text">
-                </div>
-                <!--Navbar-->
-                <nav class="navbar navbar-expand-lg navbar-dark grey lighten-5 d-flex justify-content-between z-depth-1-bottom">
-                    <div>
-                    <ul class="list-inline my-2 py-1 dark-grey-text">
-                        <li class="list-inline-item">
-                        <i class="fas fa-bars" aria-hidden="true"></i>
-                        </li>
-                        <li class="list-inline-item font-weight-bold text-uppercase">
-                        Videos
-                        </li>
-                    </ul>
-                    </div>
-                </nav>
-                <!--/.Navbar-->
-            
-                <div class="card-body grey lighten-5 rounded-bottom">
-                <!-- Grid row -->
-                <div class="row" style="overflow-y: scroll;height: 150 px;">
-                    <!-- Grid column -->
-                    <div class="col-6" id="video-list">
-                        
-                    </div>
-                    
-                </div>
-                </div>
-            </div>
-            <p>
-                <input type='checkbox' id='drop-remove' />
-                <label for='drop-remove'>remove after drop</label>
-              </p>
-        </div>
-        <div class="col-lg-9 mb-4">
-            <input type="hidden" id="username">
-            <input class="form-control form-control-lg" type="text" id="playlist" placeholder="Playlist Name" name="playlist_name">
-            <select class="browser-default custom-select custom-select-lg mb-3" id="device" required="true">
-                <option value="" disabled="disabled">Select device to assign the playlist</option>
-                <!-- {% for d in devices %}
-                    <option value="{{d.uuid}}">{{d.device_name}}</option>
-                {% endfor %} -->
-            </select>
-            <div id='calendar-container'>
-                <div id='calendar'>
+<div class="d-sm-flex justify-content-between align-items-center mb-4">
+    <h3 class="text-dark mb-0">
+        <span class="badge badge-info badge-counter"></span>
+        <!-- <span class="badge badge-info badge-counter" id="total-assigned-badge">Assigned Devices: {{videos_assigned_devices}}</span> -->
+    </h3>
+    <!-- {% if superuser %}
+            <a class="btn btn-primary btn-sm d-none d-sm-inline-block" role="button" data-toggle="modal" data-target="#assignDeviceModal">
+                <i class="fas fa-download fa-sm text-white-50">
 
-                </div>
-            </div>
-            
-            
-        </div>
-    </div>
-    
+                </i>
+                &nbsp;Assign Device
+            </a>
+        {% endif %} -->
+</div>
 <div class="row">
-    <div class="col-lg-6 mb-4">
-        <!--Modal: Name-->
-        <div class="modal fade" id="modal4" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg" role="document">
-    
+    <div class="d-sm-flex justify-content-between align-items-center mb-4">
+        <h3 class="text-dark mb-0">Videos
+            <span class="badge badge-info badge-counter" id="total-devices-badge"></span>
+            <!-- <span class="badge badge-info badge-counter" id="total-assigned-badge">Assigned Devices: {{videos_assigned_devices}}</span> -->
+        </h3>
+        <!-- {% if superuser %}
+                        <a class="btn btn-primary btn-sm d-none d-sm-inline-block" role="button" data-toggle="modal" data-target="#assignDeviceModal">
+                            <i class="fas fa-download fa-sm text-white-50">
+            
+                            </i>
+                            &nbsp;Assign Device
+                        </a>
+                    {% endif %} -->
+    </div>
+    <div class="col-md-12">
+        <div class="row" id="video-list">
+
+        </div>
+        <!-- Container -->
+
+    </div>
+    <div class="modal fade" id="assignDeviceModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-notify modal-info" role="document">
             <!--Content-->
             <div class="modal-content">
+                <!--Header-->
+                <div class="modal-header">
+                    <p class="heading lead">Modal Info</p>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true" class="white-text">&times;</span>
+                    </button>
+                </div>
+
                 <!--Body-->
-                <div class="modal-body mb-0 p-0">
-                <div class="embed-responsive embed-responsive-16by9 z-depth-1-half">
-                    <iframe class="embed-responsive-item" src=""
-                    allowfullscreen></iframe>
+                <div class="modal-body">
+                    <div class="text-center">
+
+
+                    </div>
                 </div>
-                </div>
-                <button type="button" class="btn btn-outline-primary btn-rounded btn-md ml-4" data-dismiss="modal">Close</button>
+
+                <!--Footer-->
+                <div class="modal-footer justify-content-center">
+                    <a type="button" class="btn btn-outline-primary waves-effect" data-dismiss="modal">Assign</a>
                 </div>
             </div>
             <!--/.Content-->
-            </div>
         </div>
-        <!--Modal: Name-->
+    </div>
+</div>
 
-        <!-- Modal -->
-        <div id="myModal" class="modal fade" role="dialog">
-            <div class="modal-dialog">
-        
-            <!-- Modal content-->
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                </div>
-                <div class="modal-body" method="post" >
-                    <form id="file-form" method="post" enctype="multipart/form-data" >
-                        {% csrf_token %}
+<div class="row">
+    <div class="col-lg-6 mb-4">
 
-                        <div class="form-group">
-                            <label for="file1">Upload Video</label>
-                            <input type="file" id="file1" class="form-control-file" id="video" name="video">
-                        </div>
-                        <div class="form-group">
-                            <label for="file2">Upload Thumbnail</label>
-                            <input type="file" id="file2" class="form-control-file" id="thumbnail" name="thumbnail">  
-                        </div>
-                        <button class="btn btn-primary btn-block text-white btn-user" id="submit" type="submit">Upload Video</button>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-        
-            </div>
-        </div>
-        
+
     </div>
     <div class="col">
         <div class="row">
-            
+
         </div>
     </div>
-</div>
-</div>
 </div>
 {%endblock%}
 
 {% block extra_js %}
-<script src="{% static '/fullcalendar-scheduler/main.js' %}"></script>
 <script>
-var response = JSON.parse(localStorage.getItem("response"));
-document.getElementById('username').value = response.user;
-$(document).ready(function() {
-    document.getElementById('file-form').action = '/violin/' + response.user + '/';
-    $.ajax({
-                url: '/api/video/',
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Access-Control-Allow-Origin": "*",
-                    "Authorization": "Bearer " + localStorage.getItem("token"),
-                },
-                success: function(data, status){
-                    const container = document.getElementById('video-list');
-                    data.forEach((d, idx) => {
-                        // Construct card content                        
-                        const content = `
-                                        <div class="card orange lighten-2 fc-event draggable">
-                                            <div class="view overlay">
-                                                <img class="card-img-top" src="${d.thumbnail}" alt="video">
+    $(document).ready(function () {
+        var stored_response = JSON.parse(localStorage.getItem('response'));
+        var headers = {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "Authorization": "Bearer " + localStorage.getItem("token"),
+        };
+        $.ajax({
+            url: '/api/video/',
+            method: 'GET',
+            headers: headers,
+            success: function (data, status) {
+                var container = document.getElementById('video-list');
+                data.forEach(function (d) {
+                    element = `<div class="col-md-6 col-xl-3 mb-4">
+                                <div class="card shadow border-left-primary py-2">
+                                    <img class="card-img-top" src="${d.thumbnail}" style="height:100px;" alt="Card image cap">
+                                    <div class="card-body">
+                                        <div class="row align-items-center no-gutters">
+                                            <div class="col mr-2">
+                                                <div class="text-uppercase text-primary font-weight-bold text-xs mb-1"><span></span>
                                                 </div>
-                                            <div class="card-body pb-0">
-                                                <div class="d-flex justify-content-between">
-                                                    <h6 class="font-weight-bold mb-1">${d.id}</h6>
-                                                </div>
+                                                <div class="text-dark font-weight-bold h5 mb-0"><span id="total_admins">
+                                                    <button type="button" class="btn btn-dark" onclick="delete_video('${d.uuid}');">Delete</button>
+                                                </span></div>
                                             </div>
-                                            
+                                            <div class="col-auto"></div>
                                         </div>
-                                        `;
+                                    </div>
+                                </div>
+                            </div>`;
+                    container.innerHTML += element;
+                });
+            },
+            error: function (data, status, error) {
+                alert(error);
+            }
+        });
+    });
 
-                        // Append newyly created card element to the container
-                        container.innerHTML += content;
-                        document.getElementById('total-videos').textContent = 'Total Videos: ' + data.length;
-                    });
-                    $.ajax({
-                        url: '/api/device/',
-                        method: 'GET',
-                        headers: {
-                            "Content-Type": "application/json",
-                            "Access-Control-Allow-Origin": "*",
-                            "Authorization": "Bearer " + localStorage.getItem("token"),
-                        },
-                        success: function(data, status){
-                            const container = document.getElementById('device');
-                            data.forEach((d, idx) => {
-                                const content = `<option value="${d.uuid}">${d.device_name}</option>`;
-                                container.innerHTML += content;
-                            });
-                        },
-                        error: function(data, status, error){
-                            alert(error);
-                        }
-                    });
-                },
-                error: function(data, status, error){
-                    alert(error);
-                }
-    })
-    
-});
+    // Function to subscribe and unsubscribe the device from the admin
+    function delete_video(video_uuid) {
+        var headers = {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE",
+            "Authorization": "Bearer " + localStorage.getItem("token"),
+        };
+        url = `/api/video/${video_uuid}/`;
+        var request = new XMLHttpRequest();
+        request.open('DELETE', url, false);
+        request.setRequestHeader("Content-type", "application/json");
+        request.setRequestHeader("Authorization", "Bearer " + localStorage.getItem("token"));
+        request.setRequestHeader("Access-Control-Allow-Origin", "*");
+        request.send();
+        alert('Successfully deleted the video from the system.');
+        location.reload();
+    }
 </script>
-<!-- <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
-<script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script> -->
-<script src="{% static '/react/video.js' %}"></script>
-<!-- <script src='https://cdn.jsdelivr.net/npm/moment@2.27.0/min/moment.min.js'></script> -->
-
 {%endblock%}

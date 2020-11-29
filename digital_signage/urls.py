@@ -25,7 +25,7 @@ from rest_framework_simplejwt import views as jwt_views
 from rest_framework.authtoken import views
 from django.conf.urls.static import static
 from django.conf import settings
-from device_management.template_views import * 
+from device_management.template_views import *
 
 
 class indexView(APIView):
@@ -34,24 +34,25 @@ class indexView(APIView):
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path(r'api/', include(api_router.urls)),
-    path('',indexView.as_view(), name='home'),
-
+    path("admin/", admin.site.urls),
+    path(r"api/", include(api_router.urls)),
+    path("", indexView.as_view(), name="home"),
     # JWT authentication
-    path('api/token/', TokenObtainPairPatchedView.as_view()),
-    path('api/token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
-
+    path("api/token/", TokenObtainPairPatchedView.as_view()),
+    path(
+        "api/token/refresh/", jwt_views.TokenRefreshView.as_view(), name="token_refresh"
+    ),
     # templates URL
-    path('login', login), #TODO: accept null string as argument
-    #url('^dashboard/(?P<username>[\w.@+-]+)/$', dashboard),
-    url('^dashboard/$', dashboard),
-    url('^anup/$', video),
-    url('^shikha/$', device),
-    url('^dudu/$', register),
-    url('^logout/$', logout),
-    url('^admins/$', admins),
-    url('^violin/(?P<username>[\w.@+-]+)/$', upload_video),
-    url('^maadeuta/$', playlist),
-    
+    path("login", login),  # TODO: accept null string as argument
+    # url('^dashboard/(?P<username>[\w.@+-]+)/$', dashboard),
+    url("^dashboard/$", dashboard),
+    url("^anup/$", video),
+    url("^shikha/$", device),
+    url("^dudu/$", register),
+    url("^lakshmi/$", media),
+    url("^logout/$", logout),
+    url("^profile/$", profile),
+    url("^admins/$", admins),
+    url("^violin/(?P<username>[\w.@+-]+)/$", upload_video),
+    url("^maadeuta/$", playlist),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

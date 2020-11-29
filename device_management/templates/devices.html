@@ -1,12 +1,11 @@
-{% extends "base.html" %}
+{% extends "base_v1.html" %}
 {% block dynamic %}
-<div class="container-fluid">
-    <div class="d-sm-flex justify-content-between align-items-center mb-4">
-        <h3 class="text-dark mb-0">Devices  
-            <span class="badge badge-info badge-counter" id="total-devices-badge"></span>
-            <!-- <span class="badge badge-info badge-counter" id="total-assigned-badge">Assigned Devices: {{videos_assigned_devices}}</span> -->
-        </h3>
-        <!-- {% if superuser %}
+<div class="d-sm-flex justify-content-between align-items-center mb-4">
+    <h3 class="text-dark mb-0">
+        <span class="badge badge-info badge-counter"></span>
+        <!-- <span class="badge badge-info badge-counter" id="total-assigned-badge">Assigned Devices: {{videos_assigned_devices}}</span> -->
+    </h3>
+    <!-- {% if superuser %}
             <a class="btn btn-primary btn-sm d-none d-sm-inline-block" role="button" data-toggle="modal" data-target="#assignDeviceModal">
                 <i class="fas fa-download fa-sm text-white-50">
 
@@ -14,17 +13,31 @@
                 &nbsp;Assign Device
             </a>
         {% endif %} -->
+</div>
+<div class="row">
+    <div class="d-sm-flex justify-content-between align-items-center mb-4">
+        <h3 class="text-dark mb-0">Devices
+            <span class="badge badge-info badge-counter" id="total-devices-badge"></span>
+            <!-- <span class="badge badge-info badge-counter" id="total-assigned-badge">Assigned Devices: {{videos_assigned_devices}}</span> -->
+        </h3>
+        <!-- {% if superuser %}
+                        <a class="btn btn-primary btn-sm d-none d-sm-inline-block" role="button" data-toggle="modal" data-target="#assignDeviceModal">
+                            <i class="fas fa-download fa-sm text-white-50">
+            
+                            </i>
+                            &nbsp;Assign Device
+                        </a>
+                    {% endif %} -->
     </div>
-    <div class="row">
-        <div class="col-md-12">
-                <table id="devices" class="table table-striped table-bordered" cellspacing="0" width="100%">
-                    <thead>
-                        <tr>
-                            
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- {% for device in devices  %}
+    <div class="col-md-12">
+        <table id="devices" class="table table-striped table-bordered" cellspacing="0" width="100%">
+            <thead>
+                <tr>
+
+                </tr>
+            </thead>
+            <tbody>
+                <!-- {% for device in devices  %}
                             <tr>
                                 <td>{{device.device_name}}</td>
                                 <td>{{device.topic}}</td>
@@ -33,17 +46,18 @@
                                 <td>{{device.status}}</td>
                             </tr> 
                         {% endfor %} -->
-                    </tbody>
-                </table>
-            
-        </div>
-        <div class="modal fade" id="assignDeviceModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-notify modal-info" role="document">
+            </tbody>
+        </table>
+
+    </div>
+    <div class="modal fade" id="assignDeviceModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-notify modal-info" role="document">
             <!--Content-->
             <div class="modal-content">
                 <!--Header-->
                 <div class="modal-header">
-                <p class="heading lead">Modal Info</p>
+                    <p class="heading lead">Modal Info</p>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true" class="white-text">&times;</span>
                     </button>
@@ -52,30 +66,29 @@
                 <!--Body-->
                 <div class="modal-body">
                     <div class="text-center">
-                        
-                        
+
+
                     </div>
                 </div>
 
                 <!--Footer-->
                 <div class="modal-footer justify-content-center">
-                <a type="button" class="btn btn-outline-primary waves-effect" data-dismiss="modal">Assign</a>
+                    <a type="button" class="btn btn-outline-primary waves-effect" data-dismiss="modal">Assign</a>
                 </div>
             </div>
             <!--/.Content-->
-            </div>
         </div>
     </div>
-    
-    <div class="row">
-        <div class="col-lg-6 mb-4">
-            
-            
-        </div>
-        <div class="col">
-            <div class="row">
-                
-            </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6 mb-4">
+
+
+    </div>
+    <div class="col">
+        <div class="row">
+
         </div>
     </div>
 </div>
@@ -83,65 +96,64 @@
 
 {% block extra_js %}
 <script>
-  $(document).ready(function() {
+    $(document).ready(function () {
         var stored_response = JSON.parse(localStorage.getItem('response'));
-        if (stored_response.superuser){
+        if (stored_response.superuser) {
             var columns = [
-                { title: "Name"},
+                { title: "Name" },
                 { title: "Topic" },
                 { title: "Device UUID" },
                 { title: "Unsubscribe/Subscribe" },
                 { title: "Power On/Off" },
-                { title: "Delete"},
-                { title: "Status"},
-                { title: "Added On"},
-                { title: "Belongs To"},
-            ]
-        }
-        else if (stored_response.admin){
-            var columns = [
-                { title: "Name"},
+                { title: "Delete" },
                 { title: "Status" },
                 { title: "Added On" },
-                { title: "Belongs To"},
+                { title: "Belongs To" },
+            ]
+        }
+        else if (stored_response.admin) {
+            var columns = [
+                { title: "Name" },
+                { title: "Status" },
+                { title: "Added On" },
+                { title: "Belongs To" },
             ]
         }
         var table = $('#devices').DataTable({
             columns: columns,
         });
         var headers = {
-                    "Content-Type": "application/json",
-                    "Access-Control-Allow-Origin": "*",
-                    "Authorization": "Bearer " + localStorage.getItem("token"),
-                };
-        make_call('/api/device/', 'GET', headers, function(data, status)
-        {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "Authorization": "Bearer " + localStorage.getItem("token"),
+        };
+        make_call('/api/device/', 'GET', headers, function (data, status) {
             var datas = []
             $('#total-devices-badge').text('Total Devices: ' + data.length);
-            data.forEach(function(d){
+            data.forEach(function (d) {
                 temp_data = []
                 temp_data.push(d.device_name);
-                if (stored_response.superuser){
+                if (stored_response.superuser) {
                     temp_data.push(d.topic);
                     temp_data.push(d.uuid);
-                    if (d.subscribed){
+                    if (d.subscribed) {
                         temp_data.push(`<button type="button" class="btn btn-dark" onclick="manage('${d.topic}', '${d.uuid}', false, 'subscribed');">Deassign</button>`);
                     }
-                    else{
+                    else {
                         temp_data.push(`<button type="button" class="btn btn-dark" onclick="manage('${d.topic}', '${d.uuid}', true, 'subscribed');">Subscribe</button>`);
                     }
-                    if (d.status){
+                    if (d.status) {
                         temp_data.push(`<button type="button" class="btn btn-dark" onclick="manage('${d.topic}', '${d.uuid}', false, 'status');">Off</button>`);
                     }
-                    else{
+                    else {
                         temp_data.push(`<button type="button" class="btn btn-dark" onclick="manage('${d.topic}', '${d.uuid}', true, 'status');">On</button>`);
                     }
                     temp_data.push(`<button type="button" class="btn btn-dark" onclick="delete_device('${d.topic}', '${d.uuid}');">Delete</button>`);
                 }
-                if (d.status){
+                if (d.status) {
                     temp_data.push(`<a href="#" class="badge badge-danger">On</a>`);
                 }
-                else{
+                else {
                     temp_data.push(`<a href="#" class="badge badge-danger">Off</a>`);
                 }
                 //temp_data.push(d.status);
@@ -153,64 +165,60 @@
         });
     });
 
-    function toggle(device_uuid){
+    function toggle(device_uuid) {
         alert("Toggle");
     }
 
     // Function to subscribe and unsubscribe the device from the admin
-    function manage(topic, device_uuid, status, key){
+    function manage(topic, device_uuid, status, key) {
         var headers = {
-                    "Content-Type": "application/json",
-                    "Access-Control-Allow-Origin": "*",
-                    "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE",
-                    "Authorization": "Bearer " + localStorage.getItem("token"),
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE",
+            "Authorization": "Bearer " + localStorage.getItem("token"),
         };
         url = `/api/device/${device_uuid}/`;
         var request = new XMLHttpRequest();
         request.open('PATCH', url, false);
-        request.setRequestHeader("Content-type","application/json");
-        request.setRequestHeader("Authorization","Bearer " + localStorage.getItem("token"));
+        request.setRequestHeader("Content-type", "multipart/form-data");
+        request.setRequestHeader("Authorization", "Bearer " + localStorage.getItem("token"));
         request.setRequestHeader("Access-Control-Allow-Origin", "*");
         request.send(`{"${key}": ${status}}`);
         alert('Success');
     }
 
-    function make_call(url, method, headers, callback){
+    function make_call(url, method, headers, callback) {
         var result = [];
         $.ajax({
-                url: url,
-                method: method,
-                headers: headers,
-                success: function(data, status){
-                    callback(data, status);
-                },
-                error: function(data, status, error){
-                    alert(error);
-                }
+            url: url,
+            method: method,
+            headers: headers,
+            success: function (data, status) {
+                callback(data, status);
+            },
+            error: function (data, status, error) {
+                alert(error);
+            }
         });
         return result;
     }
 
     // Function to subscribe and unsubscribe the device from the admin
-    function delete_device(topic, device_uuid){
+    function delete_device(topic, device_uuid) {
         var headers = {
-                    "Content-Type": "application/json",
-                    "Access-Control-Allow-Origin": "*",
-                    "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE",
-                    "Authorization": "Bearer " + localStorage.getItem("token"),
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE",
+            "Authorization": "Bearer " + localStorage.getItem("token"),
         };
         url = `/api/device/${device_uuid}/`;
         var request = new XMLHttpRequest();
         request.open('DELETE', url, false);
-        request.setRequestHeader("Content-type","application/json");
-        request.setRequestHeader("Authorization","Bearer " + localStorage.getItem("token"));
+        request.setRequestHeader("Content-type", "application/json");
+        request.setRequestHeader("Authorization", "Bearer " + localStorage.getItem("token"));
         request.setRequestHeader("Access-Control-Allow-Origin", "*");
         request.send();
         alert('Successfully deleted the device from the system.');
     }
 </script>
 {%endblock%}
-
-
-
-

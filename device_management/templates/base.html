@@ -8,15 +8,80 @@
     <title id="title"></title>
     <!-- <link rel="stylesheet" href="{% static '/bootstrap/css/bootstrap.min.css' %}"> -->
     <link rel="stylesheet" href="{% static '/MDB/css/bootstrap.min.css' %}">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i">
     <link rel="stylesheet" href="{% static '/fonts/fontawesome-all.min.css' %}">
-    
+
     <!-- <script src="{% static '/MDB/css/addons/datatables.min.css' %}"></script> -->
     <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/css/bootstrap-slider.min.css" /> -->
-    
+    <style>
+        /* The side navigation menu */
+        .sidebar {
+            margin: 0;
+            padding: 0;
+            width: 200px;
+            background-color: #f1f1f1;
+            position: fixed;
+            height: 100%;
+            overflow: auto;
+        }
+
+        /* Sidebar links */
+        .sidebar li.a {
+            display: block;
+            color: black;
+            padding: 16px;
+            text-decoration: none;
+        }
+
+        /* Active/current link */
+        .sidebar li.a.active {
+            background-color: rgb(24, 57, 25);
+            color: white;
+        }
+
+        /* Links on mouse-over */
+        .sidebar a:hover:not(.active) {
+            background-color: #555;
+            color: white;
+        }
+
+        /* Page content. The value of the margin-left property should match the value of the sidebar's width property */
+        div.content {
+            margin-left: 200px;
+            padding: 1px 16px;
+            height: 1000px;
+        }
+
+        /* On screens that are less than 700px wide, make the sidebar into a topbar */
+        @media screen and (max-width: 700px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .sidebar a {
+                float: left;
+            }
+
+            div.content {
+                margin-left: 0;
+            }
+        }
+
+        /* On screens that are less than 400px, display the bar vertically, instead of horizontally */
+        @media screen and (max-width: 400px) {
+            .sidebar a {
+                text-align: center;
+                float: none;
+            }
+        }
+    </style>
     {% block extra_css %}
     {%endblock%}
 </head>
+
 
 <body id="page-top">
     <div id="wrapper">
@@ -44,52 +109,62 @@
 
         <div class="d-flex flex-column" id="content-wrapper">
             <div id="content">
-                <nav class="navbar navbar-light navbar-expand bg-white shadow mb-4 topbar static-top">
+                <nav class="navbar navbar-light navbar-expand bg-white shadow topbar static-top">
+                    <a class="navbar-brand" href="#">
+                        <img src="https://mdbootstrap.com/img/logo/mdb-transparent.png" height="30" alt="mdb logo">
+                    </a>
                     <div class="collapse navbar-collapse" id="navbarNav">
-                        <ul class="navbar-nav" id="menu-list">
+                        <!-- <ul class="navbar-nav" id="menu-list">
                             <li class="nav-item active">
-                                <a class="nav-link" href="/dashboard">Dashboard <span class="sr-only">(current)</span></a>
+                                <a class="nav-link" href="/dashboard">Dashboard <span
+                                        class="sr-only">(current)</span></a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="/admins">Admins</a>
                             </li>
-                          
-                          
+
+
                             <li class="nav-item">
                                 <a class="nav-link" href="/anup">Videos</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="/maadeuta">Playlist</a>
                             </li>
-                          
+
                             <li class="nav-item">
                                 <a class="nav-link" href="/shikha">Devices</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="/dudu">Register</a>
                             </li>
-                        </ul>
-                      </div>
-                    <div class="container-fluid"><button class="btn btn-link d-md-none rounded-circle mr-3" id="sidebarToggleTop" type="button"><i class="fas fa-bars"></i></button>
+                        </ul> -->
+                    </div>
+                    <div class="container-fluid"><button class="btn btn-link d-md-none rounded-circle mr-3"
+                            id="sidebarToggleTop" type="button"><i class="fas fa-bars"></i></button>
                         <!-- <form class="form-inline d-none d-sm-inline-block mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
                             <div class="input-group"><input class="bg-light form-control border-0 small" type="text" placeholder="Search for ...">
                                 <div class="input-group-append"><button class="btn btn-primary py-0" type="button"><i class="fas fa-search"></i></button></div>
                             </div>
                         </form> -->
                         <ul class="nav navbar-nav flex-nowrap ml-auto">
-                            <li class="nav-item dropdown d-sm-none no-arrow"><a class="dropdown-toggle nav-link" data-toggle="dropdown" aria-expanded="false" href="#"><i class="fas fa-search"></i></a>
-                                <div class="dropdown-menu dropdown-menu-right p-3 animated--grow-in" aria-labelledby="searchDropdown">
+                            <li class="nav-item dropdown d-sm-none no-arrow"><a class="dropdown-toggle nav-link"
+                                    data-toggle="dropdown" aria-expanded="false" href="#"><i
+                                        class="fas fa-search"></i></a>
+                                <div class="dropdown-menu dropdown-menu-right p-3 animated--grow-in"
+                                    aria-labelledby="searchDropdown">
                                     <form class="form-inline mr-auto navbar-search w-100">
-                                        <div class="input-group"><input class="bg-light form-control border-0 small" type="text" placeholder="Search for ...">
-                                            <div class="input-group-append"><button class="btn btn-primary py-0" type="button"><i class="fas fa-search"></i></button></div>
+                                        <div class="input-group"><input class="bg-light form-control border-0 small"
+                                                type="text" placeholder="Search for ...">
+                                            <div class="input-group-append"><button class="btn btn-primary py-0"
+                                                    type="button"><i class="fas fa-search"></i></button></div>
                                         </div>
                                     </form>
                                 </div>
                             </li>
-                    
+
                             <li class="nav-item dropdown no-arrow mx-1">
                                 <!-- <div class="nav-item dropdown no-arrow"><a class="dropdown-toggle nav-link" data-toggle="dropdown" aria-expanded="false" href="#"><span class="badge badge-danger badge-counter"></span><i class="fas fa-bell fa-fw"></i></a> -->
-                                    <!-- <div class="dropdown-menu dropdown-menu-right dropdown-list dropdown-menu-right animated--grow-in">
+                                <!-- <div class="dropdown-menu dropdown-menu-right dropdown-list dropdown-menu-right animated--grow-in">
                                         <h6 class="dropdown-header">alerts center</h6>
                                         <a class="text-center dropdown-item small text-gray-500" href="#">Show All Alerts</a></div>
                                 </div> -->
@@ -105,7 +180,8 @@
                             <div class="d-none d-sm-block topbar-divider"></div>
                             <li class="nav-item dropdown no-arrow">
                                 <div class="nav-item dropdown no-arrow">
-                                    <a class="dropdown-toggle nav-link" data-toggle="dropdown" aria-expanded="false" href="#">
+                                    <a class="dropdown-toggle nav-link" data-toggle="dropdown" aria-expanded="false"
+                                        href="#">
                                         <span class="d-none d-lg-inline mr-2 text-gray-600 small" id="username"></span>
                                         <!-- <img class="border rounded-circle img-profile" src="/static/img/avatars/avatar1.jpeg"> -->
                                     </a>
@@ -119,62 +195,139 @@
                                         <a class="dropdown-item" href="#">
                                             <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>&nbsp;Activity log
                                         </a> -->
-                                        
+
                                         <a class="dropdown-item" href="/logout/" onclick="clear_local_storage();">
-                                            <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>&nbsp;Logout
+                                            <i
+                                                class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>&nbsp;Logout
                                         </a>
                                     </div>
+                                </div>
+                            </li>
+                        </ul>
                     </div>
-                    </li>
-                    </ul>
-            </div>
-            </nav>
-            {% block dynamic %}
+                </nav>
+                <div class="sidebar">
+                    <div class="list-group list-group-flush">
+                        <ul class="navbar-nav" id="menu-list">
+                            <li class="nav-item active">
+                                <a class="nav-link" href="/dashboard">Dashboard <span
+                                        class="sr-only">(current)</span></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/admins">Admins</a>
+                            </li>
 
-            {%endblock%}
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="/anup">Videos</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/maadeuta">Playlist</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="/shikha">Devices</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/dudu">Register</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Page content -->
+                <div class="content">
+                    {% block dynamic %}
+
+                    {%endblock%}
+                </div>
+                <!-- Sidebar -->
+                <!-- <div class="row">
+                    <div class="col-md-2">
+                        <div class="sidebar">
+
+                            <div class="list-group list-group-flush">
+                                <ul class="navbar-nav" id="menu-list">
+                                    <li class="nav-item active">
+                                        <a class="nav-link" href="/dashboard">Dashboard <span
+                                                class="sr-only">(current)</span></a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="/admins">Admins</a>
+                                    </li>
 
 
-        <footer class="bg-white sticky-footer">
-            <!-- <div class="container my-auto">
-                <div class="text-center my-auto copyright"><span>Copyright © {{organization_name}} 2020</span></div>
-            </div> -->
-        </footer>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="/anup">Videos</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="/maadeuta">Playlist</a>
+                                    </li>
 
-    <!-- </div><a class="border rounded d-inline scroll-to-top" href="#page-top"><i class="fas fa-angle-up"></i></a></div> -->
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/bootstrap-slider.min.js"></script> -->
-    <script src="{% static '/MDB/js/jquery.min.js' %}"></script>
-    <!-- <script src="{% static '/bootstrap/js/bootstrap.min.js' %}"></script> -->
-    <script src="{% static '/MDB/js/bootstrap.min.js' %}"></script>
-    <script src="{% static '/js/chart.min.js' %}"></script>
-    <script src="{% static '/MDB/js/addons/datatables.min.js' %}"></script>
-    <!-- <script src="{% static '/js/bs-init.js' %}"></script> -->
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.js"></script>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="/shikha">Devices</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="/dudu">Register</a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-md-10">
+                       
+                    </div>
+                </div> -->
+
+                <!-- Sidebar -->
+
+
+
+
+
+                <footer class="bg-white sticky-footer">
+                    <div class="container my-auto">
+                        <div class="text-center my-auto copyright"><span>Copyright © Vrquin 2020</span>
+                        </div>
+                    </div>
+                </footer>
+
+                <!-- </div><a class="border rounded d-inline scroll-to-top" href="#page-top"><i class="fas fa-angle-up"></i></a></div> -->
+                <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/bootstrap-slider.min.js"></script> -->
+                <script src="{% static '/MDB/js/jquery.min.js' %}"></script>
+                <!-- <script src="{% static '/bootstrap/js/bootstrap.min.js' %}"></script> -->
+                <script src="{% static '/MDB/js/bootstrap.min.js' %}"></script>
+                <script src="{% static '/js/chart.min.js' %}"></script>
+                <script src="{% static '/MDB/js/addons/datatables.min.js' %}"></script>
+                <!-- <script src="{% static '/js/bs-init.js' %}"></script> -->
+                <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.js"></script>
     <script href="{% static '/js/theme.js' %}"></script> -->
-    
-    <script>
-        $(document).ready(function() {
-            var stored_response = JSON.parse(localStorage.getItem('response'));
-            document.getElementById('username').textContent = stored_response.email;
-            if (stored_response.superuser){
-                document.getElementById("menu-list").children[2].style.display="none";
-                document.getElementById("menu-list").children[3].style.display="none";
-                //document.getElementById("menu-list").children[4].style.display="none";
-            }
-            else if (stored_response.admin != true){
-                document.getElementById("menu-list").children[0].style.display="none";
-                document.getElementById("menu-list").children[1].style.display="none";
-                document.getElementById("menu-list").children[2].style.display="none";
-                document.getElementById("menu-list").children[4].style.display="none";
-                document.getElementById("menu-list").children[5].style.display="none";
-            }
-        });
-        
-        function clear_local_storage(){
-            localStorage.clear();
-        }
-    </script>
-    {% block extra_js %}
-    {%endblock%}
+
+                <script>
+                    $(document).ready(function () {
+                        var stored_response = JSON.parse(localStorage.getItem('response'));
+                        document.getElementById('username').textContent = stored_response.email;
+                        if (stored_response.superuser) {
+                            document.getElementById("menu-list").children[2].style.display = "none";
+                            document.getElementById("menu-list").children[3].style.display = "none";
+                            //document.getElementById("menu-list").children[4].style.display="none";
+                        }
+                        else if (stored_response.admin != true) {
+                            document.getElementById("menu-list").children[0].style.display = "none";
+                            document.getElementById("menu-list").children[1].style.display = "none";
+                            document.getElementById("menu-list").children[2].style.display = "none";
+                            document.getElementById("menu-list").children[4].style.display = "none";
+                            document.getElementById("menu-list").children[5].style.display = "none";
+                        }
+                    });
+
+                    function clear_local_storage() {
+                        localStorage.clear();
+                    }
+                </script>
+                {% block extra_js %}
+                {%endblock%}
 </body>
 
 </html>

@@ -1,80 +1,95 @@
-{% extends "base.html" %}
+{% extends "base_v1.html" %}
 {% block dynamic %}
-    <div class="container">
-        <div class="card shadow-lg o-hidden border-0 my-5">
-            <div class="card-body p-0">
-                <div class="row">
-                    
-                    <div class="col-lg-12">
-                        <div class="p-5">
-                            <!-- {% if signup_success %}
+<div class="card shadow-lg o-hidden border-0 my-5">
+    <div class="card-body p-0">
+        <div class="row">
+
+            <div class="col-lg-12">
+                <div class="p-5">
+                    <!-- {% if signup_success %}
                                 <div class="card text-white bg-success shadow">
                                     <div class="card-body">
                                         <p class="m-0">"Successfully Created"</p>
                                     </div>
                                 </div>
                             {%endif%} -->
-                            <div class="text-center">
-                                <h4 class="text-dark mb-4">Create an Account!</h4>
-                            </div>
-                            <form class="user" id="register">
-                                {% csrf_token %}
-                                <div class="form-group row">
-                                    <div class="col-sm-6 mb-3 mb-sm-0"><input class="form-control form-control-user" type="text" id="first_name" placeholder="First Name" name="first_name"></div>
-                                    <div class="col-sm-6"><input class="form-control form-control-user" type="text" id="last_name" placeholder="Last Name" name="last_name"></div>
-                                </div>
-                                <div class="form-group"><input class="form-control form-control-user" type="email" id="email" aria-describedby="emailHelp" placeholder="Email Address" name="email"></div>
-                                <div class="form-group"><input class="form-control form-control-user" type="text" id="username" aria-describedby="usernameHelp" placeholder="Username should be unique eg. username@companyname" name="usernm"></div>
-                                <div class="form-group"><input class="form-control form-control-user" type="text" id="organization_name" aria-describedby="organizationnameHelp" placeholder="Organization Name" name="organization_name"></div>
-                                
-                                <div class="form-group row">
-                                    <div class="col-sm-6 mb-3 mb-sm-0"><input class="form-control form-control-user" type="password" id="password" placeholder="Password" name="password"></div>
-                                    <div class="col-sm-6"><input class="form-control form-control-user" type="password" id="repeat_password" placeholder="Repeat Password" name="password_repeat"></div>
-                                </div>
-
-                                <div class="form-group row" id="admin-checkbox">
-                                    <input type="checkbox" class="custom-control-input" id="is_staff" name="is_staff" value="0">
-                                    <label class="custom-control-label" for="is_staff">Is the user Admin</label>
-                                </div>
-                                <button class="btn btn-primary btn-block text-white btn-user" type="submit">Register Account</button>
-                            </form>
-                        </div>
+                    <div class="text-center">
+                        <h4 class="text-dark mb-4">Create an Account!</h4>
                     </div>
+                    <form class="user" id="register">
+                        {% csrf_token %}
+                        <div class="form-group row">
+                            <div class="col-sm-6 mb-3 mb-sm-0"><input class="form-control form-control-user" type="text"
+                                    id="first_name" placeholder="First Name" name="first_name"></div>
+                            <div class="col-sm-6"><input class="form-control form-control-user" type="text"
+                                    id="last_name" placeholder="Last Name" name="last_name"></div>
+                        </div>
+                        <div class="form-group"><input class="form-control form-control-user" type="email" id="email"
+                                aria-describedby="emailHelp" placeholder="Email Address" name="email"></div>
+                        <div class="form-group"><input class="form-control form-control-user" type="text" id="username"
+                                aria-describedby="usernameHelp"
+                                placeholder="Username should be unique eg. username@companyname" name="usernm"></div>
+                        <div class="form-group"><input class="form-control form-control-user" type="text"
+                                id="organization_name" aria-describedby="organizationnameHelp"
+                                placeholder="Organization Name" name="organization_name"></div>
+
+                        <div class="form-group row">
+                            <div class="col-sm-6 mb-3 mb-sm-0"><input class="form-control form-control-user"
+                                    type="password" id="password" placeholder="Password" name="password"></div>
+                            <div class="col-sm-6"><input class="form-control form-control-user" type="password"
+                                    id="repeat_password" placeholder="Repeat Password" name="password_repeat"></div>
+                        </div>
+
+                        <div class="form-group row" id="admin-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="is_staff" name="is_staff" value="0">
+                            <label class="custom-control-label" for="is_staff">Is the user Admin</label>
+                        </div>
+
+                        <div class="file-upload-wrapper">
+                            <input type="file" id="logo-file" class="file-upload" />
+                        </div>
+                        <button class="btn btn-primary btn-block text-white btn-user" type="submit">Register
+                            Account</button>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
+</div>
 {%endblock%}
 
 {% block extra_js %}
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
         var stored_response = JSON.parse(localStorage.getItem('response'));
-        if (stored_response.superuser){
+        if (stored_response.superuser) {
             document.getElementById('admin-checkbox').style.display = "none";
+        }
+        else if (stored_response.admin) {
+            document.getElementById('logo-file').style.display = "none";
         }
     });
 
 
     // function to return uuid4
     function uuidv4() {
-            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-                return v.toString(16);
-            });
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
     }
 
-    
-    $('#register').submit(function(e){
+
+    $('#register').submit(function (e) {
         e.preventDefault();
         var isValid;
         var stored_response = JSON.parse(localStorage.getItem('response'));
-        if (stored_response.superuser){
+        if (stored_response.superuser) {
             var is_staff = true;
         }
-        else{
+        else {
             var is_staff = document.getElementById("is_staff").value;
-        } 
+        }
         var username = document.forms["register"]["username"].value;
         var password = document.forms["register"]["password"].value;
         var organization_name = document.forms["register"]["organization_name"].value;
@@ -82,10 +97,10 @@
         var first_name = document.forms["register"]["first_name"].value;
         var last_name = document.forms["register"]["last_name"].value;
 
-        if (username == "" & password == "" & organization_name == "" & email == "" & first_name == "" & last_name == ""){
+        if (username == "" & password == "" & organization_name == "" & email == "" & first_name == "" & last_name == "") {
             alert("You must filled all the values in the form");
         }
-        else{
+        else {
             $.ajax({
                 url: '/api/signup/',
                 method: "POST",
@@ -106,15 +121,37 @@
                     "last_name": last_name,
                     "organization_uuid": uuidv4(),
                 }),
-                success: function(data, status){
-                    alert(status);
+                success: function (data, status) {
+                    if (document.getElementById("logo-file").value != "") {
+                        var file_id = document.getElementById("logo-file");
+                        var file = file_id.files[0];
+                        var data_file = new FormData();
+                        data_file.append("company_logo", file);
+
+                        var xhr = new XMLHttpRequest();
+                        xhr.withCredentials = true;
+
+                        xhr.addEventListener("readystatechange", function () {
+                            if (this.readyState === 4) {
+                                alert("Successfully uploaded the company logo");
+                            }
+                        });
+
+                        xhr.open("PATCH", '/api/signup/' + data.id + '/');
+                        xhr.setRequestHeader("Authorization", "Bearer " + localStorage.getItem("token"));
+                        xhr.setRequestHeader("cache-control", "no-cache");
+
+                        xhr.send(data_file);
+                    }
                 },
-                error: function(data, status, error){
+                error: function (data, status, error) {
                     alert(error);
                 }
             })
         }
+        alert("Successfully added Admin user");
+        location.reload("/admins/");
     });
-    
+
 </script>
 {%endblock%}
