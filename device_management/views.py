@@ -339,14 +339,12 @@ class PlayListViewSet(ModelViewSet):
 
     def create_playlist(self, request, *args, **kwargs):
         # import pdb; pdb.set_trace();
-        videos_list = json.loads(request.data.get("scheduled_videos"))
+        videos_list = request.data.get("scheduled_videos")
         name = request.data.get("playlist")
         device_uuid = request.data.get("device_uuid")
         device_obj = Device.objects.get(uuid=device_uuid)
-        if kwargs["from_cache"]:
-            admin_id = Admin.objects.get(username=kwargs["username"]).id
-        else:
-            admin_id = request.GET["query"]["user_id"]
+
+        admin_id = request.GET["query"]["user_id"]
 
         video_objs = []
         for p in videos_list:
@@ -357,8 +355,7 @@ class PlayListViewSet(ModelViewSet):
                 playlist_data["video_start_from"] = p["start"]
                 playlist_data["start"] = p["start"]
                 playlist_data["end"] = p.get("end", None)
-            video_id = int(p["title"].replace("\n", ""))
-            video_obj = Video.objects.get(id=video_id)
+            video_obj = Video.objects.get(uuid=p["video_uuid"])
             p["video"] = video_obj.video.url
             p["thumbnail"] = video_obj.thumbnail.url
 
@@ -409,30 +406,12 @@ class PlayListViewSet(ModelViewSet):
         return Response(serialized_data, status=status.HTTP_200_OK)
 
     def list(self, request, *args, **kwargs):
-        if "org_uuid" in request.GET and "playlist_id" in request.GET:
-            queryset = (
-                self.get_queryset()
-                .select_related("belongs_to")
-                .filter(
-                    belongs_to__organization_uuid=request.GET.get("org_uuid"),
-                    id=request.GET.get("playlist_id"),
-                )
-            )
-        elif "org_uuid" in request.GET:
-            final_data = []
-            keys_found = {}
-            queryset = (
-                self.get_queryset()
-                .select_related("belongs_to")
-                .filter(belongs_to__organization_uuid=request.GET.get("org_uuid"))
-            )
-        else:
-            admin_id = request.GET["query"]["user_id"]
-            queryset = (
-                self.get_queryset()
-                .select_related("belongs_to")
-                .filter(belongs_to=admin_id)
-            )
+        admin_id = request.GET["query"]["user_id"]
+        queryset = (
+            self.get_queryset()
+            .select_related("belongs_to")
+            .filter(belongs_to=admin_id)
+        )
         serialized_data = self.serializer_class(
             queryset, many=True, context={"retrieve": True}
         ).data

@@ -48,7 +48,6 @@ routes_token_not_required = [
     "dudu",
     "create",
     "maadeuta",
-    "playlist",
     "profile",
 ]
 
