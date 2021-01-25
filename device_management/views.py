@@ -337,64 +337,77 @@ class PlayListViewSet(ModelViewSet):
     serializer_class = PlayListSerializer
     lookup_field = "uuid"
 
-    def create_playlist(self, request, *args, **kwargs):
-        # import pdb; pdb.set_trace();
-        videos_list = request.data.get("scheduled_videos")
-        name = request.data.get("playlist")
-        device_uuid = request.data.get("device_uuid")
-        device_obj = Device.objects.get(uuid=device_uuid)
+    def create_playlist(self, playlist_obj, request, *args, **kwargs):
+        playlist_data = {}
+        videos_list = request.data.get("scheduled_videos", None)
+        name = request.data.get("playlist", None)
+        device_uuid = request.data.get("device_uuid", None)
 
-        admin_id = request.GET["query"]["user_id"]
+        if device_uuid:
+            device_obj = Device.objects.get(uuid=device_uuid)
+            playlist_data.update({"device": [device_obj.id]})
+            # Change the status of device obj to true so that it is assigned
+            device_obj.status = True
+            device_obj.save()
 
         video_objs = []
-        for p in videos_list:
-            playlist_data = {}
-            if "Z" not in p["start"]:
-                playlist_data["video_start_from"] = p["start"] + "T00:00:00Z"
-            else:
-                playlist_data["video_start_from"] = p["start"]
-                playlist_data["start"] = p["start"]
-                playlist_data["end"] = p.get("end", None)
-            video_obj = Video.objects.get(uuid=p["video_uuid"])
-            p["video"] = video_obj.video.url
-            p["thumbnail"] = video_obj.thumbnail.url
+        if videos_list:
+            for p in videos_list:
+                playlist_data = {}
+                if "Z" not in p["start"]:
+                    playlist_data["video_start_from"] = p["start"] + "T00:00:00Z"
+                else:
+                    playlist_data["video_start_from"] = p["start"]
+                    playlist_data["start"] = p["start"]
+                    playlist_data["end"] = p.get("end", None)
+                video_obj = Video.objects.get(uuid=p["video_uuid"])
+                p["video"] = video_obj.video.url
+                p["thumbnail"] = video_obj.thumbnail.url
 
-            # playlist_data['belongs_to__device'] = device_obj
-            serializer = PlayTimeScheduleSerializer(data=playlist_data)
-            serializer.is_valid(raise_exception=True)
-            obj = serializer.save()
-            video_obj.playtime.add(obj)
-            device_obj.video.add(video_obj)
-            video_objs.append(video_obj.id)
+                # playlist_data['belongs_to__device'] = device_obj
+                serializer = PlayTimeScheduleSerializer(data=playlist_data)
+                serializer.is_valid(raise_exception=True)
+                obj = serializer.save()
+                video_obj.playtime.add(obj)
+                device_obj.video.add(video_obj)
+                video_objs.append(video_obj.id)
 
-        # will save the playlist now
-        playlist_data = {
-            "name": name,
-            "belongs_to": admin_id,
-            "device": [device_obj.id],
-            "video": list(set(video_objs)),
-        }
-        serializer = self.serializer_class(data=playlist_data)
-        serializer.is_valid(raise_exception=True)
-        obj = serializer.save()
+            playlist_data.update({"video": list(set(video_objs))})
 
-        # Change the status of device obj to true so that it is assigned
-        device_obj.status = True
-        device_obj.save()
+        if name:
+            playlist_data.update({"name": name})
+
+        serializer = self.serializer_class(instance=playlist_obj, data=playlist_data, partial=True)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
 
         # Publish the message to broker and client will pull the message
         hostname = os.environ["MQTT_HOSTNAME"]
-        topic = device_obj.belongs_to.topic
-        publish.single(
-            topic,
-            {
-                "devices": device_obj.uuid.__str__(),
-                "message": videos_list,
-                "message_code": 8000,
-            }.__repr__(),
-            hostname=hostname,
-        )
+
+        message = {
+            "message_code": 8000,
+        }
+        if device_uuid and videos_list:
+            topic = device_obj.belongs_to.topic
+            message.update({"devices": device_obj.uuid.__str__()})
+            message.update({"message": videos_list})
+            publish.single(
+                topic,
+                message.__repr__(),
+                hostname=hostname,
+            )
         return True
+
+    def create(self, request, *args, **kwargs):
+        save_data = {
+            "name": request.data.get("playlist"),
+            "belongs_to": request.GET["query"]["user_id"]
+        }
+        serialized = self.get_serializer(data=save_data)
+        if serialized.is_valid(raise_exception=True):
+            serialized.save()
+            return Response({"status": "Success"}, status=status.HTTP_200_OK)
+        return Response({"status": "Failed"}, status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self, request, *args, **kwargs):
         admin_id = request.GET["query"]["user_id"]
@@ -417,31 +430,17 @@ class PlayListViewSet(ModelViewSet):
         ).data
         return Response(serialized_data, status=status.HTTP_200_OK)
 
-    def create(self, request, *args, **kwargs):
-        username = request.GET.get("username", None)
-        if username:
-            if True:
-                # Will create the magic now
-                kwargs["from_cache"] = True
-                kwargs["username"] = username
-                result = self.create_playlist(request, *args, **kwargs)
-            else:
-                return Response(
-                    {"status": "failed", "message": "unauthorized"},
-                    status=status.HTTP_401_UNAUTHORIZED,
-                )
+    def partial_update(self, request, *args, **kwargs):
+        playlist_uuid = kwargs["uuid"]
+        playlist_obj = self.get_object()
+        if self.create_playlist(playlist_obj, request, *args, **kwargs):
+            return Response(
+                {"status": "success", "message": "updated"}, status=status.HTTP_200_OK
+            )
         else:
-            if "query" in request.GET:
-                kwargs["from_cache"] = False
-                result = self.create_playlist(request, *args, **kwargs)
-            else:
-                return Response(
-                    {"status": "failed", "message": "unauthorized"},
-                    status=status.HTTP_401_UNAUTHORIZED,
-                )
-        return Response(
-            {"status": "success", "message": "created"}, status=status.HTTP_200_OK
-        )
+            return Response(
+                {"status": "failed", "message": "failed"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
     def destroy(self, request, *args, **kwargs):
         username = request.GET.get("username", None)
