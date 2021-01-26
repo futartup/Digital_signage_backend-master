@@ -372,7 +372,8 @@ class PlayListViewSet(ModelViewSet):
                 serializer.is_valid(raise_exception=True)
                 obj = serializer.save()
                 video_obj.playtime.add(obj)
-                device_obj.video.add(video_obj)
+                if device_uuid:
+                    device_obj.video.add(video_obj)
                 video_objs.append(video_obj.id)
 
             final_playlist_data.update({"video": list(set(video_objs))})
@@ -406,10 +407,9 @@ class PlayListViewSet(ModelViewSet):
         return True
 
     def create(self, request, *args, **kwargs):
-        if "scheduled_videos" in request.data and bool(request.data.get("scheduled_videos")):
-            if "device_uuid" not in request.data:
-                return Response({"status": "Failed", "message": "You need to send the device uuid"},
-                                status=status.HTTP_400_BAD_REQUEST)
+        if "scheduled_videos" in request.data and not bool(request.data.get("scheduled_videos")):
+            return Response({"status": "Failed", "message": "You need to select some videos"},
+                            status=status.HTTP_400_BAD_REQUEST)
         if "playlist_uuid" in request.data:
             playlist_obj = PlayList.objects.get(uuid=request.data.get("playlist_uuid"))
             self.create_playlist(playlist_obj, request, *args, **kwargs)
