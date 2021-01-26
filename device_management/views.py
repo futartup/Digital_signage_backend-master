@@ -338,14 +338,14 @@ class PlayListViewSet(ModelViewSet):
     lookup_field = "uuid"
 
     def create_playlist(self, playlist_obj, request, *args, **kwargs):
-        playlist_data = {}
+        final_playlist_data = {}
         videos_list = request.data.get("scheduled_videos", None)
         name = request.data.get("playlist", None)
         device_uuid = request.data.get("device_uuid", None)
 
         if device_uuid:
             device_obj = Device.objects.get(uuid=device_uuid)
-            playlist_data.update({"device": [device_obj.id]})
+            final_playlist_data.update({"device": [device_obj.id]})
             # Change the status of device obj to true so that it is assigned
             device_obj.status = True
             device_obj.save()
@@ -362,7 +362,10 @@ class PlayListViewSet(ModelViewSet):
                     playlist_data["end"] = p.get("end", None)
                 video_obj = Video.objects.get(uuid=p["video_uuid"])
                 p["video"] = video_obj.video.url
-                p["thumbnail"] = video_obj.thumbnail.url
+                if video_obj.thumbnail:
+                    p["thumbnail"] = video_obj.thumbnail.url
+                else:
+                    p["thumbnail"] = ""
 
                 # playlist_data['belongs_to__device'] = device_obj
                 serializer = PlayTimeScheduleSerializer(data=playlist_data)
@@ -372,12 +375,16 @@ class PlayListViewSet(ModelViewSet):
                 device_obj.video.add(video_obj)
                 video_objs.append(video_obj.id)
 
-            playlist_data.update({"video": list(set(video_objs))})
+            final_playlist_data.update({"video": list(set(video_objs))})
 
         if name:
-            playlist_data.update({"name": name})
+            final_playlist_data.update({"name": name})
 
-        serializer = self.serializer_class(instance=playlist_obj, data=playlist_data, partial=True)
+        if playlist_obj:
+            serializer = self.serializer_class(instance=playlist_obj, data=final_playlist_data, partial=True)
+        else:
+            final_playlist_data.update({"belongs_to": request.GET["query"]["user_id"]})
+            serializer = self.serializer_class(data=final_playlist_data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
 
@@ -399,15 +406,18 @@ class PlayListViewSet(ModelViewSet):
         return True
 
     def create(self, request, *args, **kwargs):
-        save_data = {
-            "name": request.data.get("playlist"),
-            "belongs_to": request.GET["query"]["user_id"]
-        }
-        serialized = self.get_serializer(data=save_data)
-        if serialized.is_valid(raise_exception=True):
-            serialized.save()
+        if "scheduled_videos" in request.data and bool(request.data.get("scheduled_videos")):
+            if "device_uuid" not in request.data:
+                return Response({"status": "Failed", "message": "You need to send the device uuid"},
+                                status=status.HTTP_400_BAD_REQUEST)
+        if "playlist_uuid" in request.data:
+            playlist_obj = PlayList.objects.get(uuid=request.data.get("playlist_uuid"))
+            self.create_playlist(playlist_obj, request, *args, **kwargs)
             return Response({"status": "Success"}, status=status.HTTP_200_OK)
-        return Response({"status": "Failed"}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            if self.create_playlist(None, request, *args, **kwargs):
+                return Response({"status": "Success"}, status=status.HTTP_200_OK)
+            return Response({"status": "Failed"}, status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self, request, *args, **kwargs):
         admin_id = request.GET["query"]["user_id"]
