@@ -124,7 +124,10 @@ class VideoSerializer(ModelSerializer):
         return os.environ["HOST_NAME"] + obj.video.url
 
     def _get_thumbnail(self, obj):
-        return os.environ["HOST_NAME"] + obj.thumbnail.url
+        if obj.thumbnail:
+            return os.environ["HOST_NAME"] + obj.thumbnail.url
+        else:
+            return ''
 
     def _get_device(self, obj):
         device_obj = Device.objects.filter(video__id=obj.id)
