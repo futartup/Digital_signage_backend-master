@@ -389,21 +389,6 @@ class PlayListViewSet(ModelViewSet):
         if serializer.is_valid(raise_exception=True):
             serializer.save()
 
-        # Publish the message to broker and client will pull the message
-        hostname = os.environ["MQTT_HOSTNAME"]
-
-        message = {
-            "message_code": 8000,
-        }
-        if device_uuid and videos_list:
-            topic = device_obj.belongs_to.topic
-            message.update({"devices": device_obj.uuid.__str__()})
-            message.update({"message": videos_list})
-            publish.single(
-                topic,
-                message.__repr__(),
-                hostname=hostname,
-            )
         return True
 
     def create(self, request, *args, **kwargs):
@@ -478,6 +463,44 @@ class PlayListViewSet(ModelViewSet):
 
         return Response(
             {"status": "success", "message": "Deleted"}, status=status.HTTP_200_OK
+        )
+
+    @action(detail=False, methods=['POST'])
+    def schedule(self, request, *args, **kwargs):
+        playlist_uuid = request.data.get("playlist_uuid", None)
+        if not playlist_uuid:
+            return Response(
+                {"status": "failed", "message": "please send the uuid of the playlist"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        playlist_obj = PlayList.objects.get(uuid=playlist_uuid)
+        if playlist_obj:
+            videos = playlist_obj.video.all()
+            devices = playlist_obj.device.all()
+            # Publish the message to broker and client will pull the message
+            hostname = os.environ["MQTT_HOSTNAME"]
+
+            message = {
+                "message_code": 8000,
+            }
+            if videos and devices:
+                topic = playlist_obj.belongs_to.topic
+                videos_list = [{"video": f"{request.scheme}/{request.META['HTTP_HOST']}{v.video.url}"} for v in videos]
+                message.update({"devices": devices[0].uuid.__str__()})
+                message.update({"message": videos_list})
+                message.update({"start_date": request.data.get("start_date", datetime.now().__str__())})
+                publish.single(
+                    topic,
+                    message.__repr__(),
+                    hostname=hostname,
+                )
+        else:
+            return Response(
+                {"status": "failed", "message": "The playlist is not found in database"},
+                status=status.HTTP_204_NO_CONTENT
+            )
+        return Response(
+            {"status": "success", "message": f"Scheduled on {datetime.now()}"}, status=status.HTTP_200_OK
         )
 
 
