@@ -443,6 +443,7 @@ class PlayListViewSet(ModelViewSet):
         devices_uuid = [d.uuid.__str__() for d in playlist_obj.device.all()]
         devices = playlist_obj.device.clear()
         videos = playlist_obj.video.all()
+        videos_list = VideoSerializer(videos, many=True).data
         for v in videos:
             v.playtime.clear()
 
