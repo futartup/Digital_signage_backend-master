@@ -524,10 +524,7 @@ class DeviceViewSet(ModelViewSet):
         return Response(serialized_data, status=status.HTTP_200_OK)
 
     def list(self, request=None, *args, **kwargs):
-        query_filter = {}
-        admin_id = request.GET["query"]["user_id"]
         super_user = request.GET["query"]["superuser"]
-        admin = request.GET["query"]["admin"]
         organization_uuid = request.GET["query"]["organization_uuid"]
         if super_user:
             queryset = self.get_queryset().select_related("belongs_to").all()
@@ -539,22 +536,8 @@ class DeviceViewSet(ModelViewSet):
                     belongs_to__organization_uuid=organization_uuid, subscribed=True
                 )
             )
-        final_result = [
-            {
-                "id": x.id,
-                "device_name": x.name,
-                "status": x.status,
-                "topic": x.belongs_to.topic,
-                "uuid": x.uuid,
-                "added_on": x.added_on,
-                "message": x.callback_message,
-                "belongs_to": x.belongs_to.id,
-                "subscribed": x.subscribed,
-                "organization_name": x.belongs_to.organization_name,
-            }
-            for x in queryset
-        ]
-        return Response(final_result, status=status.HTTP_200_OK)
+        serialized = self.get_serializer(queryset, many=True).data
+        return Response(serialized, status=status.HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
         super_user = request.GET["query"]["superuser"]
