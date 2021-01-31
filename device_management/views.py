@@ -150,12 +150,12 @@ class AdminViewSet(ModelViewSet):
 
         if serializer.is_valid(raise_exception=True):
             obj = serializer.save()
-            if request.GET["query"]["superuser"] and not request.FILES:
-                queryset = (
-                    self.get_queryset()
-                    .filter(organization_uuid=obj.organization_uuid)
-                    .update(is_active=request.data["is_active"])
-                )
+            # if request.GET["query"]["superuser"] and not request.FILES:
+            #     queryset = (
+            #         self.get_queryset()
+            #         .filter(organization_uuid=obj.organization_uuid)
+            #         .update(is_active=request.data["is_active"])
+            #     )
             return Response({"status": True}, status=status.HTTP_200_OK)
         else:
             return Response(
