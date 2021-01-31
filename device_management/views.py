@@ -488,7 +488,7 @@ class PlayListViewSet(ModelViewSet):
             }
             if videos and devices:
                 topic = playlist_obj.belongs_to.topic
-                videos_list = [{"video": f"{request.scheme}/{request.META['HTTP_HOST']}{v.video.url}"} for v in videos]
+                videos_list = [{"video": f"{request.scheme}://{request.META['HTTP_HOST']}{v.video.url}"} for v in videos]
                 message.update({"devices": devices[0].uuid.__str__()})
                 message.update({"message": videos_list})
                 message.update({"start_date": request.data.get("start_date", datetime.now().__str__())})
