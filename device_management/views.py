@@ -263,7 +263,6 @@ class VideoViewSet(ModelViewSet):
                 device_obj.video.set(video_obj)
                 video_obj.first().playtime.add(playtime_obj)
                 device_obj.playtime.add(playtime_obj)
-            print(video_obj.first().belongs_to.topic)
             publish.single(
                 video_obj.first().belongs_to.topic,
                 {
@@ -291,7 +290,10 @@ class VideoViewSet(ModelViewSet):
         video_uuid = kwargs["uuid"]
         video_obj = self.get_object()
         video_url = os.environ["HOST_NAME"] + video_obj.video.url
-        thumbnail_url = os.environ["HOST_NAME"] + video_obj.thumbnail.url
+        if video_obj.thumbnail:
+            thumbnail_url = os.environ["HOST_NAME"] + video_obj.thumbnail.url
+        else:
+            thumbnail_url = ""
         topic = video_obj.belongs_to.topic
 
         if playtime_uuid != None:
