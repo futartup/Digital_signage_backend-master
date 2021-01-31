@@ -548,17 +548,35 @@ class DeviceViewSet(ModelViewSet):
 
         # Super user can only assign devices to company
         if super_user:
-            topic = request.data.get("topic")
-            message = request.data.get("message")
-            # device = request.data.get("device")
-            hostname = os.environ["MQTT_HOSTNAME"]
-            admin_id = Admin.objects.get(id=request.data.get("belongs_to"))
-            Device.objects.create(
-                name=request.data.get("name"), belongs_to=admin_id, subscribed=True
-            )
-            # publish.single(topic, {"devices": device, "message": message}.__repr__(), hostname=hostname)
+            import pdb; pdb.set_trace();
+            # topic = request.data.get("topic")
+            # message = request.data.get("message")
+            # # device = request.data.get("device")
+            # hostname = os.environ["MQTT_HOSTNAME"]
+            import pdb; pdb.set_trace();
+            if request.data:
+                device_data = {}
+                if request.FILES.get("device_image", None):
+                    device_data["device_image"] = request.data.get("image")
+                device_data["callback_message"] = request.data.get("message")
+                device_data["name"] = request.data.get("name")
+
+                device_data["status"] = request.data.get("status_device")
+
+                device_data["subscribed"] = request.data.get("subscribed")
+                device_data["product_id"] = request.data.get("product_id")
+                device_data["version"] = request.data.get("version")
+                device_data["manufacturer"] = request.data.get("manufacturer")
+                device_data["model"] = request.data.get("model")
+                device_data["manufacturing_data"] = request.data.get("manufacturing_data")
+                device_data["warranty"] = request.data.get("warranty")
+                device_data["description"] = request.data.get("description")
+                print(device_data)
+
+                admin_id = Admin.objects.get(id=int(request.data.get("belongs_to")))
+            Device.objects.create(**device_data)
             return Response(
-                {"status": "success", "message": "published {}".format(message)},
+                {"status": "success", "message": "Device Created"},
                 status=status.HTTP_200_OK,
             )
         else:
@@ -599,16 +617,3 @@ class DeviceViewSet(ModelViewSet):
         obj.playtime.clear()
         obj.delete()
         return Response({"status": True}, status=status.HTTP_200_OK)
-
-    # @action(detail=False, methods=['PATCH'])
-    # def manage(self, request, *args, **kwargs):
-    #     device_id = request.GET.get('device_id')
-    #     admin_id = request.GET.get('admin_id')
-    #     device_obj = self.get_queryset().filter(id=device_id, belongs_to=admin_id)
-    #     device_obj.subscribed = False
-    #     serializer = self.get_serializer(instance=device_obj, data={'subscribed': True}, partial=True)
-    #     if serializer.is_valid(raise_exception=True):
-    #         obj = serializer.save()
-    #         return Response({'status': True}, status=status.HTTP_200_OK)
-    #     else:
-    #         return Response({'status': True}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -81,6 +81,16 @@ def thumbnail_user_directory_path(instance, filename):
     return "thumbnails/user_{0}/{1}".format(instance.belongs_to.uuid, filename)
 
 
+def device_directory_path(instance, filename):
+    # file will be uploaded to MEDIA_ROOT/thumbnails/user_<id>/<filename>
+    file = "devices/user_{0}/{1}".format(instance.belongs_to.uuid, filename).replace(
+        " ", "_"
+    )
+    if os.path.exists(os.path.join(settings.MEDIA_ROOT + "/" + os.path.join(file))):
+        os.remove(os.path.join(settings.MEDIA_ROOT + "/" + os.path.join(file)))
+    return "devices/user_{0}/{1}".format(instance.belongs_to.uuid, filename)
+
+
 class PlayTimeSchedule(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     video_start_from = models.DateTimeField(blank=True, null=True)
@@ -129,9 +139,9 @@ class Device(models.Model):
     manufacturing_data = models.DateTimeField(default=dt.now, null=True)
     warranty = models.DateTimeField(default=dt.now, null=True)
     description = models.TextField(blank=True, null=True)
-    # device_image = models.ImageField(upload_to=thumbnail_user_directory_path)
+    device_image = models.FileField(upload_to=device_directory_path)
 
-    # Foreign Keys
+    # Foreign Keys+
     belongs_to = models.ForeignKey(
         Admin, on_delete=models.PROTECT, blank=True, null=True
     )
