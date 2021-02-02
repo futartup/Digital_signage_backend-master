@@ -548,12 +548,6 @@ class DeviceViewSet(ModelViewSet):
 
         # Super user can only assign devices to company
         if super_user:
-            import pdb; pdb.set_trace();
-            # topic = request.data.get("topic")
-            # message = request.data.get("message")
-            # # device = request.data.get("device")
-            # hostname = os.environ["MQTT_HOSTNAME"]
-            import pdb; pdb.set_trace();
             if request.data:
                 device_data = {}
                 if request.FILES.get("device_image", None):
@@ -617,3 +611,27 @@ class DeviceViewSet(ModelViewSet):
         obj.playtime.clear()
         obj.delete()
         return Response({"status": True}, status=status.HTTP_200_OK)
+
+
+class DashboardViewSet(ModelViewSet):
+    queryset = Device.objects.all()
+    serializer_class = DeviceSerializer
+    lookup_field = "uuid"
+
+    def list(self, request, *args, **kwargs):
+        super_user = request.GET["query"]["superuser"]
+        admin = request.GET["query"]["admin"]
+        user_id = request.GET["query"]["user_id"]
+        organization_uuid = request.GET["query"]["organization_uuid"]
+
+        if super_user:
+            devices = self.get_queryset().count()
+            videos = Video.objects.all().count()
+            users = Admin.objects.all().count()
+        elif admin:
+            devices = self.get_queryset().filter(belongs_to=admin).count()
+            videos = Video.objects.filter(belongs_to=user_id).count()
+            users = Admin.objects.filter(organization_uuid=organization_uuid).count()
+
+        return Response({"status": "success", "data": {"devices": devices, "users": users, "videos": videos}},
+                        status=status.HTTP_200_OK)

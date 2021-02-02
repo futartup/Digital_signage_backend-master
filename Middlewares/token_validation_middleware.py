@@ -42,7 +42,6 @@ routes_token_not_required = [
     "token",
     "media",
     "login",
-    "dashboard",
     "anup",
     "shikha",
     "dudu",
