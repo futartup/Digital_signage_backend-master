@@ -492,6 +492,8 @@ class PlayListViewSet(ModelViewSet):
                 message.update({"devices": devices[0].uuid.__str__()})
                 message.update({"message": videos_list})
                 message.update({"start_date": request.data.get("start_date", datetime.now().__str__())})
+                message.update({"end_date": request.data.get("end_date", None)})
+                message.update({"frame": request.data.get("frame", None)})
                 publish.single(
                     topic,
                     message.__repr__(),
