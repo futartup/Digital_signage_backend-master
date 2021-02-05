@@ -14,7 +14,7 @@ from itertools import islice
 from django.contrib.auth.hashers import make_password
 from django.core.cache import cache
 from rest_framework.decorators import action
-
+from django.db import connection
 
 # MQTT imports
 import paho.mqtt.client as mqtt
@@ -94,10 +94,10 @@ class AdminViewSet(ModelViewSet):
 
         if super_user:
             # Return all the users of a company
-            queryset = self.get_queryset().filter(is_staff=True)
+            queryset = self.get_queryset().filter(is_staff=True, deleted=False)
         elif admin:
             # Return all the admin and staff of the company
-            queryset = self.get_queryset().filter(organization_uuid=organization_uuid)
+            queryset = self.get_queryset().filter(organization_uuid=organization_uuid, deleted=False)
 
         serialized_data = self.serializer_class(queryset, many=True).data
         return Response(serialized_data, status=status.HTTP_200_OK)
@@ -162,12 +162,12 @@ class AdminViewSet(ModelViewSet):
                 {"status": True}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-    # def destroy(self, request, *args, **kwargs):
-    #     obj = self.get_object()
-    #     obj.video.clear()
-    #     obj.playtime.clear()
-    #     obj.delete()
-    #     return Response({'status': True}, status=status.HTTP_200_OK)
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serialized = self.get_serializer(instance=instance, data={"deleted": True}, partial=True)
+        if serialized.is_valid(raise_exception=True):
+            serialized.save()
+        return Response({"status": True}, status=status.HTTP_200_OK)
 
 
 class VideoViewSet(ModelViewSet):
@@ -480,25 +480,31 @@ class PlayListViewSet(ModelViewSet):
         if playlist_obj:
             videos = playlist_obj.video.all()
             devices = playlist_obj.device.all()
-            # Publish the message to broker and client will pull the message
-            hostname = os.environ["MQTT_HOSTNAME"]
 
-            message = {
-                "message_code": 8000,
-            }
-            if videos and devices:
-                topic = playlist_obj.belongs_to.topic
-                videos_list = [{"video": f"{request.scheme}://{request.META['HTTP_HOST']}{v.video.url}"} for v in videos]
-                message.update({"devices": devices[0].uuid.__str__()})
-                message.update({"message": videos_list})
-                message.update({"start_date": request.data.get("start_date", datetime.now().__str__())})
-                message.update({"end_date": request.data.get("end_date", None)})
-                message.update({"frame": request.data.get("frame", None)})
-                publish.single(
-                    topic,
-                    message.__repr__(),
-                    hostname=hostname,
-                )
+            if devices[0].enabled:
+                # Publish the message to broker and client will pull the message
+                hostname = os.environ["MQTT_HOSTNAME"]
+
+                message = {
+                    "message_code": 8000,
+                }
+                if videos and devices:
+                    topic = playlist_obj.belongs_to.topic
+                    videos_list = [{"video": f"{request.scheme}://{request.META['HTTP_HOST']}{v.video.url}"} for v in videos]
+                    message.update({"devices": devices[0].uuid.__str__()})
+                    message.update({"message": videos_list})
+                    message.update({"start_date": request.data.get("start_date", datetime.now().__str__())})
+                    message.update({"end_date": request.data.get("end_date", None)})
+                    message.update({"frame": request.data.get("frame", None)})
+                    publish.single(
+                        topic,
+                        message.__repr__(),
+                        hostname=hostname,
+                    )
+            else:
+                return Response({"status": "failed", "message": "The device is disabled by superadmin. Please "
+                                                                "contact vrquin"},
+                                status=status.HTTP_422_UNPROCESSABLE_ENTITY)
         else:
             return Response(
                 {"status": "failed", "message": "The playlist is not found in database"},
@@ -582,30 +588,38 @@ class DeviceViewSet(ModelViewSet):
             )
 
     def partial_update(self, request, *args, **kwargs):
-        obj = self.get_object()
-        serializer = self.get_serializer(instance=obj, data=request.data, partial=True)
-        if serializer.is_valid(raise_exception=True):
-            obj = serializer.save()
-            if "subscribed" in request.data and request.data["subscribed"] == True:
-                message = 201
-            elif "subscribed" in request.data and request.data["subscribed"] == False:
-                message = 202
-            elif "status" in request.data and request.data["status"] == True:
-                message = 203
-            elif "status" in request.data and request.data["status"] == False:
-                message = 204
-            publish.single(
-                obj.belongs_to.topic,
-                {
-                    "devices": obj.uuid.__str__(),
-                    "message_code": message,
-                }.__repr__(),
-            )
-            return Response({"status": True}, status=status.HTTP_200_OK)
+        super_user = request.GET["query"]["superuser"]
+        if super_user:
+            obj = self.get_object()
+            serializer = self.get_serializer(instance=obj, data=request.data, partial=True)
+            if serializer.is_valid(raise_exception=True):
+                obj = serializer.save()
+                if "subscribed" in request.data and request.data["subscribed"] == True:
+                    message = 201
+                elif "subscribed" in request.data and request.data["subscribed"] == False:
+                    message = 202
+                elif "status" in request.data and request.data["status"] == True:
+                    message = 203
+                elif "status" in request.data and request.data["status"] == False:
+                    message = 204
+                elif "enabled" in request.data and request.data["enabled"] == False:
+                    message = 205
+                elif "enabled" in request.data and request.data["enabled"] == True:
+                    message = 206
+                publish.single(
+                    obj.belongs_to.topic,
+                    {
+                        "devices": obj.uuid.__str__(),
+                        "message_code": message,
+                    }.__repr__(),
+                )
+                return Response({"status": True}, status=status.HTTP_200_OK)
+            else:
+                return Response(
+                    {"status": True}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
         else:
-            return Response(
-                {"status": True}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+            return Response({"status": True, "message": "Only superuser can manage devices"}, status=status.HTTP_200_OK)
 
     def destroy(self, request, *args, **kwargs):
         obj = self.get_object()

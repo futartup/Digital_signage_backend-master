@@ -34,6 +34,7 @@ def profile_directory_path(instance, filename):
 class Admin(AbstractUser):
     organization_uuid = models.UUIDField(blank=True, null=True)
     uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    deleted = models.BooleanField(default=False)
     last_login = models.DateTimeField(null=True)
     archived_on = models.DateTimeField(null=True, blank=True)
     restored_on = models.DateTimeField(null=True, blank=True)
@@ -122,6 +123,7 @@ class Video(models.Model):
 class Device(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     status = models.BooleanField(default=False)
+    enabled = models.BooleanField(default=True)
     added_on = models.DateTimeField(default=dt.now, null=True)
     removed_on = models.DateTimeField(default=dt.now, null=True)
     modified_on = models.DateTimeField(default=dt.now, null=True)
