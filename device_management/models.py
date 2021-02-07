@@ -156,7 +156,7 @@ class Device(models.Model):
 
 class PlayList(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
-    name = models.CharField(unique=True, max_length=100, blank=True)
+    name = models.CharField(max_length=100, blank=True)
     added_on = models.DateTimeField(default=dt.now, null=True)
     modified_on = models.DateTimeField(default=dt.now, null=True)
 

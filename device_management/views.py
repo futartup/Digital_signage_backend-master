@@ -573,9 +573,9 @@ class DeviceViewSet(ModelViewSet):
                 device_data["manufacturing_data"] = request.data.get("manufacturing_data")
                 device_data["warranty"] = request.data.get("warranty")
                 device_data["description"] = request.data.get("description")
-                print(device_data)
+                device_data["belongs_to"] = int(request.data.get("belongs_to"))
 
-                admin_id = Admin.objects.get(id=int(request.data.get("belongs_to")))
+                #admin_id = Admin.objects.get(id=int(request.data.get("belongs_to")))
             Device.objects.create(**device_data)
             return Response(
                 {"status": "success", "message": "Device Created"},
