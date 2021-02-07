@@ -59,6 +59,25 @@ class AdminSerializer(ModelSerializer):
         model = Admin
         fields = "__all__"
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["company_logo"] = serializers.SerializerMethodField("_get_company_logo")
+        self.fields["profile_photo"] = serializers.SerializerMethodField("_get_profile_photo")
+
+    def _get_company_logo(self, instance):
+        request = self.context.get("request")
+        if instance.company_logo:
+            return f"{request.scheme}://{request.META['HTTP_HOST']}/{instance.company_logo}"
+        else:
+            return f"{request.scheme}://{request.META['HTTP_HOST']}/media/logo/default-company-logo.png"
+
+    def _get_profile_photo(self, instance):
+        request = self.context.get("request")
+        if instance.profile_photo:
+            return f"{request.scheme}://{request.META['HTTP_HOST']}/{instance.profile_photo}"
+        else:
+            return f"{request.scheme}://{request.META['HTTP_HOST']}/media/profile/default-profile-pic.jpg"
+
 
 class PlayTimeScheduleSerializer(ModelSerializer):
     class Meta:
@@ -76,6 +95,14 @@ class DeviceSerializer(ModelSerializer):
                 )
             if "video_all" in self.context:
                 self.fields["video"] = serializers.SerializerMethodField("_get_video")
+        self.fields["device_image"] = serializers.SerializerMethodField("_get_device_image")
+
+    def _get_device_image(self, instance):
+        request = self.context.get("request")
+        if instance.device_image:
+            return f"{request.scheme}://{request.META['HTTP_HOST']}/media/{instance.device_image}"
+        else:
+            return f"{request.scheme}://{request.META['HTTP_HOST']}/media/logo/default-company-logo.png"
 
     def _get_video(self, obj):
         video_objs = obj.video.all()

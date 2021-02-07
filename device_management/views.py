@@ -99,7 +99,7 @@ class AdminViewSet(ModelViewSet):
             # Return all the admin and staff of the company
             queryset = self.get_queryset().filter(organization_uuid=organization_uuid, deleted=False)
 
-        serialized_data = self.serializer_class(queryset, many=True).data
+        serialized_data = self.serializer_class(queryset, many=True, context={"request": request}).data
         return Response(serialized_data, status=status.HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
@@ -109,7 +109,6 @@ class AdminViewSet(ModelViewSet):
             )
             added_by = request.data.get("added_by", None)
             if request.GET["query"]["superuser"]:
-                # request.data['topic'] = "{}/{}".format(request.data['organization_name'].replace(' ', '_'), request.data['organization_uuid'])
                 request.data["topic"] = "vrquin"
             else:
                 added_by_obj = Admin.objects.get(id=added_by)
@@ -529,6 +528,7 @@ class DeviceViewSet(ModelViewSet):
                 "retrieve": True,
                 "video_all": True,
                 "device_obj": device_obj,
+                "request": request,
             },
         ).data
         return Response(serialized_data, status=status.HTTP_200_OK)
@@ -559,7 +559,7 @@ class DeviceViewSet(ModelViewSet):
             if request.data:
                 device_data = {}
                 if request.FILES.get("device_image", None):
-                    device_data["device_image"] = request.data.get("image")
+                    device_data["device_image"] = request.FILES.get("device_image")
                 device_data["callback_message"] = request.data.get("message")
                 device_data["name"] = request.data.get("name")
 
@@ -576,8 +576,8 @@ class DeviceViewSet(ModelViewSet):
                 admin_id = Admin.objects.get(id=int(request.data.get("belongs_to")))
                 device_data["belongs_to"] = admin_id
 
+            device_obj = Device.objects.create(**device_data)
 
-            Device.objects.create(**device_data)
             return Response(
                 {"status": "success", "message": "Device Created"},
                 status=status.HTTP_200_OK,
