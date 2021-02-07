@@ -67,14 +67,14 @@ class AdminSerializer(ModelSerializer):
     def _get_company_logo(self, instance):
         request = self.context.get("request")
         if instance.company_logo:
-            return f"{request.scheme}://{request.META['HTTP_HOST']}/{instance.company_logo}"
+            return f"{request.scheme}://{request.META['HTTP_HOST']}/media/{instance.company_logo}"
         else:
             return f"{request.scheme}://{request.META['HTTP_HOST']}/media/logo/default-company-logo.png"
 
     def _get_profile_photo(self, instance):
         request = self.context.get("request")
         if instance.profile_photo:
-            return f"{request.scheme}://{request.META['HTTP_HOST']}/{instance.profile_photo}"
+            return f"{request.scheme}://{request.META['HTTP_HOST']}/media/{instance.profile_photo}"
         else:
             return f"{request.scheme}://{request.META['HTTP_HOST']}/media/profile/default-profile-pic.jpg"
 
