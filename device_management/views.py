@@ -116,7 +116,7 @@ class AdminViewSet(ModelViewSet):
                 request.data["organization_name"] = added_by_obj.organization_name
                 request.data["organization_uuid"] = added_by_obj.organization_uuid
                 request.data["company_logo"] = added_by_obj.company_logo
-            serializer = self.serializer_class(data=request.data)
+            serializer = self.serializer_class(data=request.data, context={"request": request})
             serializer.is_valid(raise_exception=True)
             obj = serializer.save()
             # if obj:
