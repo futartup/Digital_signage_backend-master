@@ -565,7 +565,7 @@ class DeviceViewSet(ModelViewSet):
 
                 device_data["status"] = request.data.get("status_device")
 
-                device_data["subscribed"] = request.data.get("subscribed")
+                device_data["subscribed"] = request.data.get("subscribed", True)
                 device_data["product_id"] = request.data.get("product_id")
                 device_data["version"] = request.data.get("version")
                 device_data["manufacturer"] = request.data.get("manufacturer")
