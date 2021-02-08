@@ -644,11 +644,11 @@ class DashboardViewSet(ModelViewSet):
         if super_user:
             devices = self.get_queryset().count()
             videos = Video.objects.all().count()
-            users = Admin.objects.all().count()
+            users = Admin.objects.all(deleted=False).count()
         elif admin:
             devices = self.get_queryset().filter(belongs_to=admin).count()
             videos = Video.objects.filter(belongs_to=user_id).count()
-            users = Admin.objects.filter(organization_uuid=organization_uuid).count()
+            users = Admin.objects.filter(organization_uuid=organization_uuid, deleted=False).count()
 
         return Response({"status": "success", "data": {"devices": devices, "users": users, "videos": videos}},
                         status=status.HTTP_200_OK)
