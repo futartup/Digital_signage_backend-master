@@ -644,7 +644,7 @@ class DashboardViewSet(ModelViewSet):
         if super_user:
             devices = self.get_queryset().count()
             videos = Video.objects.all().count()
-            users = Admin.objects.filter(deleted=False).count()
+            users = Admin.objects.filter(is_staff=True, deleted=False).count()
         elif admin:
             devices = self.get_queryset().filter(belongs_to=admin).count()
             videos = Video.objects.filter(belongs_to=user_id).count()
