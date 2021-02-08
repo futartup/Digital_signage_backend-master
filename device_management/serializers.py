@@ -43,14 +43,14 @@ class TokenObtainPairPatchedSerializer(TokenObtainPairSerializer):
             }
         )
         if self.user.company_logo:
-            r.update({"company_logo": "/media/" + self.user.company_logo.__str__()})
+            r.update({"company_logo": "http://103.211.218.11:8000/media/" + self.user.company_logo.__str__()})
         else:
-            r.update({"company_logo": ""})
+            r.update({"company_logo": "http://103.211.218.11:8000/media/logo/default-company-logo.png"})
 
         if self.user.profile_photo:
-            r.update({"profile_pic": "/media/" + self.user.profile_photo.__str__()})
+            r.update({"profile_pic": "http://103.211.218.11:8000/media/" + self.user.profile_photo.__str__()})
         else:
-            r.update({"profile_pic": ""})
+            r.update({"profile_pic": "http://103.211.218.11:8000/media/profile/default-profile-pic.jpg"})
         return r
 
 
