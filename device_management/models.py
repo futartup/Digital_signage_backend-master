@@ -139,7 +139,7 @@ class Device(models.Model):
     manufacturer = models.CharField(max_length=20, blank=True, null=True)
     model = models.CharField(max_length=50, blank=True, null=True)
     manufacturing_data = models.DateTimeField(default=dt.now, null=True)
-    warranty = models.DateField(default=dt.now, null=True)
+    warranty = models.DateTimeField(default=dt.now, null=True)
     description = models.TextField(blank=True, null=True)
     device_image = models.FileField(upload_to=device_directory_path)
 
