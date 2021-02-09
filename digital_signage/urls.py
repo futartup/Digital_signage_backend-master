@@ -37,22 +37,8 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path(r"api/", include(api_router.urls)),
     path("", indexView.as_view(), name="home"),
+
     # JWT authentication
     path("api/token/", TokenObtainPairPatchedView.as_view()),
-    path(
-        "api/token/refresh/", jwt_views.TokenRefreshView.as_view(), name="token_refresh"
-    ),
-    # templates URL
-    path("login", login),  # TODO: accept null string as argument
-    # url('^dashboard/(?P<username>[\w.@+-]+)/$', dashboard),
-    url("^dashboard/$", dashboard),
-    url("^anup/$", video),
-    url("^shikha/$", device),
-    url("^dudu/$", register),
-    url("^lakshmi/$", media),
-    url("^logout/$", logout),
-    url("^profile/$", profile),
-    url("^admins/$", admins),
-    url("^violin/(?P<username>[\w.@+-]+)/$", upload_video),
-    url("^maadeuta/$", playlist),
+    path("api/token/refresh/", jwt_views.TokenRefreshView.as_view(), name="token_refresh")
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
