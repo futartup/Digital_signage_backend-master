@@ -577,11 +577,10 @@ class DeviceViewSet(ModelViewSet):
         obj = self.get_object()
         super_user = request.GET["query"]["superuser"]
         if request.FILES.get("device_image", None):
-            data = {"device_image": request.FILES.get("device_image")}
-            serializer = self.get_serializer(instance=obj, data=data, partial=True)
-            serializer.is_valid(raise_exception=True)
-            serializer = self.get_serializer(serializer.save()).data
-            return Response({"status": True, "data": serializer}, status=status.HTTP_200_OK)
+            obj.device_image = request.FILES.get("device_image")
+            obj.save()
+            data = self.get_serializer(obj).data
+            return Response({"status": True, "data": data}, status=status.HTTP_200_OK)
         if super_user:
             serializer = self.get_serializer(instance=obj, data=request.data, partial=True)
             if serializer.is_valid(raise_exception=True):
