@@ -573,6 +573,7 @@ class DeviceViewSet(ModelViewSet):
             )
 
     def partial_update(self, request, *args, **kwargs):
+        message = 0
         obj = self.get_object()
         super_user = request.GET["query"]["superuser"]
         if request.FILES.get("device_image", None):
@@ -580,7 +581,6 @@ class DeviceViewSet(ModelViewSet):
             serializer = self.get_serializer(instance=obj, data=data, partial=True)
             serializer.is_valid(raise_exception=True)
             serializer = self.get_serializer(serializer.save()).data
-            serializer["device_image"] = f"{request.scheme}://{request.META['HTTP_HOST']}{serializer['device_image']}"
             return Response({"status": True, "data": serializer}, status=status.HTTP_200_OK)
         if super_user:
             serializer = self.get_serializer(instance=obj, data=request.data, partial=True)
