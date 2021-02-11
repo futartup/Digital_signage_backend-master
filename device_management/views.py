@@ -130,34 +130,24 @@ class AdminViewSet(ModelViewSet):
 
     def partial_update(self, request, *args, **kwargs):
         obj = self.get_object()
-
+        import pdb; pdb.set_trace()
         if request.FILES:
-            data = {}
             if "company_logo" in request.FILES:
-                data["company_logo"] = request.FILES.get("company_logo")
-            elif "profile_pic" in request.FILES:
-                data["profile_photo"] = request.FILES.get("profile_pic")
-            serializer = self.get_serializer(
-                instance=obj,
-                data=data,
-                partial=True,
-            )
+                obj.company_logo = request.FILES.get("company_logo")
+            if "profile_pic" in request.FILES:
+                obj.profile_photo = request.FILES.get("profile_pic")
+            obj.save()
+            serialized_data = self.get_serializer(obj, context={"request": request}).data
+            return Response(serialized_data, status=status.HTTP_200_OK)
         else:
             if "password" in request.data:
                 request.data["password"] = make_password(request.data["password"], None, "md5")
-            serializer = self.get_serializer(
-                instance=obj, data=request.data, partial=True
-            )
+            serializer = self.get_serializer(instance=obj, data=request.data, partial=True)
 
         if serializer.is_valid(raise_exception=True):
             obj = serializer.save()
-            # if request.GET["query"]["superuser"] and not request.FILES:
-            #     queryset = (
-            #         self.get_queryset()
-            #         .filter(organization_uuid=obj.organization_uuid)
-            #         .update(is_active=request.data["is_active"])
-            #     )
-            return Response({"status": True}, status=status.HTTP_200_OK)
+            serialized_data = self.get_serializer(obj, context={"request": request}).data
+            return Response(serialized_data, status=status.HTTP_200_OK)
         else:
             return Response(
                 {"status": True}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
