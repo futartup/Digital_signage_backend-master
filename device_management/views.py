@@ -130,7 +130,6 @@ class AdminViewSet(ModelViewSet):
 
     def partial_update(self, request, *args, **kwargs):
         obj = self.get_object()
-        import pdb; pdb.set_trace()
         if request.FILES:
             if "company_logo" in request.FILES:
                 obj.company_logo = request.FILES.get("company_logo")
