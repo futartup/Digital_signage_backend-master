@@ -470,31 +470,34 @@ class PlayListViewSet(ModelViewSet):
         if playlist_obj:
             videos = playlist_obj.video.all()
             devices = playlist_obj.device.all()
+            if bool(devices):
+                if devices[0].enabled:
+                    # Publish the message to broker and client will pull the message
+                    hostname = os.environ["MQTT_HOSTNAME"]
 
-            if devices[0].enabled:
-                # Publish the message to broker and client will pull the message
-                hostname = os.environ["MQTT_HOSTNAME"]
-
-                message = {
-                    "message_code": 8000,
-                }
-                if videos and devices:
-                    topic = playlist_obj.belongs_to.topic
-                    videos_list = [{"video": f"{request.scheme}://{request.META['HTTP_HOST']}{v.video.url}"} for v in videos]
-                    message.update({"devices": devices[0].uuid.__str__()})
-                    message.update({"message": videos_list})
-                    message.update({"start_date": request.data.get("start_date", datetime.now().__str__())})
-                    message.update({"end_date": request.data.get("end_date", None)})
-                    message.update({"frame": request.data.get("frame", None)})
-                    publish.single(
-                        topic,
-                        message.__repr__(),
-                        hostname=hostname,
-                    )
+                    message = {
+                        "message_code": 8000,
+                    }
+                    if videos and devices:
+                        topic = playlist_obj.belongs_to.topic
+                        videos_list = [{"video": f"{request.scheme}://{request.META['HTTP_HOST']}{v.video.url}"} for v in videos]
+                        message.update({"devices": devices[0].uuid.__str__()})
+                        message.update({"message": videos_list})
+                        message.update({"start_date": request.data.get("start_date", datetime.now().__str__())})
+                        message.update({"end_date": request.data.get("end_date", None)})
+                        message.update({"frame": request.data.get("frame", None)})
+                        publish.single(
+                            topic,
+                            message.__repr__(),
+                            hostname=hostname,
+                        )
+                else:
+                    Response({"status": "failed", "message": "The device is disabled by superadmin. Please "
+                                                             "contact vrquin"},
+                             status=status.HTTP_422_UNPROCESSABLE_ENTITY)
             else:
-                return Response({"status": "failed", "message": "The device is disabled by superadmin. Please "
-                                                                "contact vrquin"},
-                                status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+                return Response({"status": "failed", "message": "This playlist has not been assigned to any device"},
+                                status=status.HTTP_200_OK)
         else:
             return Response(
                 {"status": "failed", "message": "The playlist is not found in database"},
