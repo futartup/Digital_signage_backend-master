@@ -48,9 +48,9 @@ class TokenObtainPairPatchedSerializer(TokenObtainPairSerializer):
             r.update({"company_logo": "http://103.211.218.11:8000/media/logo/default-company-logo.png"})
 
         if self.user.profile_photo:
-            r.update({"profile_pic": "http://103.211.218.11:8000/media/" + self.user.profile_photo.__str__()})
+            r.update({"profile_photo": "http://103.211.218.11:8000/media/" + self.user.profile_photo.__str__()})
         else:
-            r.update({"profile_pic": "http://103.211.218.11:8000/media/profile/default-profile-pic.jpg"})
+            r.update({"profile_photo": "http://103.211.218.11:8000/media/profile/default-profile-pic.jpg"})
         return r
 
 
@@ -184,7 +184,7 @@ class VideoField(serializers.RelatedField):
 
     def to_internal_value(self, name):
         video = self.get_queryset().filter(id=id).first()
-        if not skill:
+        if not video:
             raise ValueError("{} is not a valid Video".format(id))
         return video
 
