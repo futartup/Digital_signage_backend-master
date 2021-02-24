@@ -140,7 +140,8 @@ class AdminViewSet(ModelViewSet):
             return Response(serialized_data, status=status.HTTP_200_OK)
         else:
             if "password" in request.data:
-                request.data["password"] = make_password(request.data["password"], None, "md5")
+                if request.data["password"] is not None:
+                    request.data["password"] = make_password(request.data["password"], None, "md5")
             serializer = self.get_serializer(instance=obj, data=request.data, partial=True)
 
         if serializer.is_valid(raise_exception=True):
