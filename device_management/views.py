@@ -142,6 +142,8 @@ class AdminViewSet(ModelViewSet):
             if "password" in request.data:
                 if request.data["password"] is not None:
                     request.data["password"] = make_password(request.data["password"], None, "md5")
+                else:
+                    request.data.pop("password")
             serializer = self.get_serializer(instance=obj, data=request.data, partial=True)
 
         if serializer.is_valid(raise_exception=True):
