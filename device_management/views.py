@@ -608,11 +608,16 @@ class DeviceViewSet(ModelViewSet):
             return Response({"status": True, "message": "Only superuser can manage devices"}, status=status.HTTP_200_OK)
 
     def destroy(self, request, *args, **kwargs):
-        obj = self.get_object()
-        obj.video.clear()
-        obj.playtime.clear()
-        obj.delete()
-        return Response({"status": True}, status=status.HTTP_200_OK)
+        super_user = request.GET["query"]["superuser"]
+        if super_user:
+            obj = self.get_object()
+            obj.video.clear()
+            obj.playtime.clear()
+            obj.delete()
+            return Response({"status": True}, status=status.HTTP_200_OK)
+        else:
+            return Response({"status": True, "message": "Only super admin can delete device."},
+                            status=status.HTTP_406_NOT_ACCEPTABLE)
 
 
 class DashboardViewSet(ModelViewSet):
