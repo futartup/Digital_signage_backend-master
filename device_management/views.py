@@ -611,10 +611,14 @@ class DeviceViewSet(ModelViewSet):
         super_user = request.GET["query"]["superuser"]
         if super_user:
             obj = self.get_object()
-            obj.video.clear()
-            obj.playtime.clear()
-            obj.delete()
-            return Response({"status": True}, status=status.HTTP_200_OK)
+            if not obj.enabled:
+                obj.video.clear()
+                obj.playtime.clear()
+                obj.delete()
+                return Response({"status": True}, status=status.HTTP_200_OK)
+            else:
+                return Response({"status": True, "message": "The device cannot be deleted as the device is enabled"},
+                                status=status.HTTP_200_OK)
         else:
             return Response({"status": True, "message": "Only super admin can delete device."},
                             status=status.HTTP_406_NOT_ACCEPTABLE)
