@@ -155,6 +155,7 @@ class PlayList(models.Model):
     name = models.CharField(max_length=100, blank=True)
     added_on = models.DateTimeField(default=dt.now, null=True)
     modified_on = models.DateTimeField(default=dt.now, null=True)
+    scheduled = models.BooleanField(default=False)
 
     # Foreign Keys
     video = models.ManyToManyField(Video, blank=True, null=True)

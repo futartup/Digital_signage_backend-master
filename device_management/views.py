@@ -473,6 +473,7 @@ class PlayListViewSet(ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
         playlist_obj = PlayList.objects.get(uuid=playlist_uuid)
+
         if playlist_obj:
             videos = playlist_obj.video.all()
             devices = playlist_obj.device.all()
@@ -497,6 +498,10 @@ class PlayListViewSet(ModelViewSet):
                             message.__repr__(),
                             hostname=hostname,
                         )
+                        playlist_obj.scheduled = True
+                        playlist_obj.save()
+                        Response({"status": "failed", "message": "The Playlist has been scheduled."},
+                                 status=status.HTTP_200_OK)
                 else:
                     Response({"status": "failed", "message": "The device is disabled by superadmin. Please "
                                                              "contact vrquin"},
