@@ -1,13 +1,9 @@
 import os
 import uuid
-import boto3
-import random
-from django.db import models
-from django.contrib.auth.models import AbstractUser
-from django.core.files.storage import default_storage
-from botocore.client import Config
 from datetime import datetime as dt
-from django.contrib.auth.hashers import make_password
+
+from django.contrib.auth.models import AbstractUser
+from django.db import models
 
 # Import signals
 from .signals import *

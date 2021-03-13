@@ -4,6 +4,9 @@ import uuid
 import subprocess
 from datetime import datetime
 from rest_framework.viewsets import ModelViewSet
+import shutil
+from django.db.models import FileField
+
 from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.response import Response
@@ -645,4 +648,31 @@ class DashboardViewSet(ModelViewSet):
             users = Admin.objects.filter(organization_uuid=organization_uuid, deleted=False).count()
 
         return Response({"status": "success", "data": {"devices": devices, "users": users, "videos": videos}},
+                        status=status.HTTP_200_OK)
+
+
+class AboutViewSet(ModelViewSet):
+    queryset = Device.objects.all()
+    serializer_class = DeviceSerializer
+    lookup_field = "id"
+
+    def list(self, request, *args, **kwargs):
+        path = os.path.join(settings.MEDIA_ROOT + "/about/")
+        files = os.listdir(path=path)
+        full_path = f"{request.scheme}://{request.META['HTTP_HOST']}/media/about/{files[0]}"
+        return Response({"status": "success", "message": "Successfully updated about image.",
+                         "data": full_path},
+                        status=status.HTTP_200_OK)
+
+    def create(self, request, *args, **kwargs):
+        about_file = request.FILES["about_file"]
+        file = "{}".format(about_file).replace(" ", "_")
+
+        # delete all the files inside the directory
+        for f in os.scandir(os.path.join(settings.MEDIA_ROOT + "/about/")):
+            os.remove(f.path)
+
+        file_path = os.path.join(settings.MEDIA_ROOT + "/about/" + os.path.join(file))
+        open(file_path, 'wb').write(about_file.file.read())
+        return Response({"status": "success", "message": "Successfully updated about image."},
                         status=status.HTTP_200_OK)
